@@ -204,6 +204,7 @@ class RootNote extends Note {
 			this.hz = prev.hz * i.n / i.d
 			this._interval = i
 		}
+		this.quantize()
 	}
 	resolute(n, d) {
 		return [n, d]
@@ -287,6 +288,7 @@ class SubNote extends Note {
 		return `{${tav(...this.resolute())}}`
 	}
 	get hz() {
+		// 量子化されていない真のhz
 		return this.parentNote.hz * this.interval.n / this.interval.d
 	}
 	quantize() {
