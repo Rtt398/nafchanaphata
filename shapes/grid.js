@@ -2,8 +2,8 @@
 class Grid extends Konva.Layer {
 	constructor(tonic, beat) {
 		super() // {listening: false})
-		this.tonic = tonic
-		this.beat = beat
+		this._tonic = tonic
+		this._beat = beat
 		this.octave = f2d(1, 2)
 		
 		this.scorelines = new Konva.Group()
@@ -38,7 +38,7 @@ class Grid extends Konva.Layer {
 			this.loopStart.y(-stage.y() / stage.scaleY() + 15)
 		}).on('dragend', e => {
 			stage.isNoteDragging = false
-			Tone.Transport.loopStart = x2t(this.loopStart.x()) + OFFSET + "i"
+			this.setLoop()
 		})
 		this.loopEnd = new Konva.Group({
 			x: 480,
@@ -58,15 +58,32 @@ class Grid extends Konva.Layer {
 			this.loopEnd.y(-stage.y() / stage.scaleY() + 15)
 		}).on('dragend', e => {
 			stage.isNoteDragging = false
-			Tone.Transport.loopEnd = x2t(this.loopEnd.x()) + OFFSET + "i"
+			this.setLoop()
 		})
-		Tone.Transport.loopStart = x2t(this.loopStart.x()) + OFFSET + "i"
-		Tone.Transport.loopEnd = x2t(this.loopEnd.x()) + OFFSET + "i"
+		this.setLoop()
 		
 		this.add(this.scorelines, this.beatlines, this.tonicline, this.indicator, this.loopEnd, this.loopStart)
 		this.drawScorelines()
 		this.drawBeatlines()
 		this.adjust()
+	}
+	
+	get beat() {
+		return this._beat
+	}
+	set beat(v) {
+		this._beat = v
+		$('#config-beat').value = v
+		grid.drawBeatlines()
+	}
+	
+	get tonic() {
+		return this._tonic
+	}
+	set tonic(v) {
+		this._tonic = v
+		$('#config-tonic').value = v
+		grid.drawScorelines()
 	}
 	
 	drawScorelines() {
@@ -112,6 +129,7 @@ class Grid extends Konva.Layer {
 			
 		}
 		this.adjust()
+		Tone.Transport.bpm.value = 60000 / ($('#config-beat').value || 500)
 	}
 	//位置のみ変更
 	adjust() {
@@ -137,5 +155,10 @@ class Grid extends Konva.Layer {
 	hideIndicator() {
 		this.indicator.hide()
 		this.anim.stop()
+	}
+	
+	setLoop() {
+		Tone.Transport.loopStart = x2t(this.loopStart.x()) + OFFSET + "i"
+		Tone.Transport.loopEnd = x2t(this.loopEnd.x()) + OFFSET + "i"
 	}
 }

@@ -1,6 +1,6 @@
 
 class Note extends Konva.Group {
-	constructor(opt, len, delay = 0, interval = null) {
+	constructor(opt, len, delay = null, interval = null) {
 		super(opt)
 		this.pitchline = new Konva.Line({
 			x: delay,
@@ -36,11 +36,11 @@ class Note extends Konva.Group {
 		this.childLinks = new Konva.Group()
 		this.add(this.childNotes)
 	}
-	addNote(len, interval) {
-		const child = new SubNote(this.delay || 0, len, interval, this)
+	addNote(len, interval, delay = 0) {
+		const child = new SubNote(delay || this.delay || 0, len, interval, this)
 		this.childNotes.add(child)
 		this.childLinks.add(child.link)
-		this.root.buildPart()
+		return child
 	}
 	
 	get len() {
@@ -62,18 +62,6 @@ class Note extends Konva.Group {
 	}
 	get notes() {
 		return this.childNotes.getChildren().map(x => x.notes).flat().concat(this.mute ? [] : this.note)
-	}
-	buildPart() {
-		this._part?.dispose()
-		this._part = new Tone.Part((time, note) => {
-			sampler.triggerAttackRelease(
-				note.hz,
-				note.len,
-				time,
-				note.vol
-			)
-		}, this.notes).start(this.noteHead + "i")
-		return this._part
 	}
 	get noteHead() {
 		return x2t(this.x()) + OFFSET
@@ -102,7 +90,7 @@ class Note extends Konva.Group {
 }
 
 class RootNote extends Note {
-	constructor(x, y, len, hz, prev, interval) {
+	constructor(x, y, len, hz, interval) {
 		super({
 			x: qh(x),
 			y: hz2y(qb(y2hz(y))), // || hz2y(hz || prev.hz * interval.n / interval.d),
@@ -110,8 +98,8 @@ class RootNote extends Note {
 		}, len, 0, interval)
 		this.type = 'root'
 		this._hz = hz || qb(y2hz(y))
-		this.prev = prev
 		playNotes([{...this.note, time:"0i"}])
+		this.root.buildPart()
 
 		this.on('dragstart', e => {
 			const offsetX = this.getRelativePointerPosition().x
@@ -181,6 +169,7 @@ class RootNote extends Note {
 		this._hz = p
 		this.y(hz2y(p))
 		this._interval = undefined
+		this.quantize()
 	}
 	quantize() {
 		this._hz = qb(y2hz(this.y()))
@@ -212,6 +201,18 @@ class RootNote extends Note {
 	get root() {
 		return this
 	}
+	buildPart() {
+		this._part?.dispose()
+		this._part = new Tone.Part((time, note) => {
+			sampler.triggerAttackRelease(
+				note.hz,
+				note.len,
+				time,
+				note.vol
+			)
+		}, this.notes).start(this.noteHead + "i")
+		return this._part
+	}
 }
 
 class SubNote extends Note {
@@ -225,6 +226,7 @@ class SubNote extends Note {
 		this.pitchline.draggable(true)
 		this.quantize()
 		playNotes([{...this.note, time:"0i"}])
+		this.root.buildPart()
 
 		this.pitchline.on('dragstart', e => {
 			e.cancelBubble = true
@@ -291,6 +293,11 @@ class SubNote extends Note {
 		// 量子化されていない真のhz
 		return this.parentNote.hz * this.interval.n / this.interval.d
 	}
+	set hz(v) {
+		// 量子化されたhz
+		this._hz = v
+		this.y(hz2y(this._hz) - this.parentNote.getAbsolutePosition(stage).y)
+	}
 	quantize() {
 		this._hz = qs(this.hz)
 		this.y(hz2y(this._hz) - this.parentNote.getAbsolutePosition(stage).y)
@@ -351,6 +358,7 @@ $('#rootdelete').addEventListener('click', e => {
 $('#delete').addEventListener('click', e => {
 	if (stage.current) {
 		stage.current.del()
+		stage.current.root.buildPart()
 		stage.current = undefined
 	}
 	$('#overlay').style.visibility = ''
@@ -391,7 +399,7 @@ for (const el of $$('.prog-btn')) {
 	el.addEventListener('click', function(e) {
 		// rootの音高を移動させる操作 (0d以外は累積)
 		if (!stage.current) return
-		const shift = pitchIntervals[($('#root-prog-dir').checked ? '-' : '+') + this.innerText]
+		const shift = pitchIntervals[($('#root-prog-dir').checked ? '-' : '') + this.innerText]
 		const interval = this.innerText == '0d' ? {n: 1, d: 1} : stage.current.interval || {n: 1, d: 1}
 		stage.current.interval = {n: interval.n * shift.n, d: interval.d * shift.d}
 		$('#rootmenu').style.top = stage.current.pitchline.absolutePosition().y + "px"
@@ -402,7 +410,7 @@ for (const el of $$('.prog-btn')) {
 for (const el of $$('.trans-btn')) {
 	el.addEventListener('click', function(e) {
 		// 自身の音高差を変更する操作 (上書き)
-		stage.current.interval = pitchIntervals[($('#trans-dir').checked ? '-' : '+') + this.innerText]
+		stage.current.interval = pitchIntervals[($('#trans-dir').checked ? '-' : '') + this.innerText]
 		$('#menu').style.top = stage.current.pitchline.absolutePosition().y + "px"
 		$(`#hz`).innerText = Math.round(stage.current.hz)
 		$(`#tav`).innerText = stage.current.tav
@@ -411,13 +419,13 @@ for (const el of $$('.trans-btn')) {
 for (const el of $$('.root-exp-btn')) {
 	el.addEventListener('click', function(e) {
 		// 自身と所定の音高差を持つnoteを追加する操作
-		stage.current.addNote(stage.current.len, pitchIntervals[($('#root-exp-dir').checked ? '-' : '+') + this.innerText])
+		stage.current.addNote(stage.current.len, pitchIntervals[($('#root-exp-dir').checked ? '-' : '') + this.innerText])
 	})
 }
 for (const el of $$('.exp-btn')) {
 	el.addEventListener('click', function(e) {
 		// 自身と所定の音高差を持つnoteを追加する操作
-		stage.current.addNote(stage.current.len, pitchIntervals[($('#exp-dir').checked ? '-' : '+') + this.innerText])
+		stage.current.addNote(stage.current.len, pitchIntervals[($('#exp-dir').checked ? '-' : '') + this.innerText])
 	})
 }
 

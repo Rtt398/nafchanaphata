@@ -41,7 +41,8 @@ i {
 }
 
 :is(nav,.row).tiny-space {
-	gap: 0.5rem;
+	gap: 1%;
+	justify-content: center;
 }
 
 canvas {

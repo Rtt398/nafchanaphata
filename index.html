@@ -11,7 +11,7 @@
 <body class="dark">
 <div id="sequencer"></div>
 <header class="absolute bottom responsive max small-blur"><nav class="tiny-space primary-text">
-	<label class="checkbox icon small-padding">
+	<label class="checkbox icon top-padding bottom-padding small-padding">
 		Shift<input type="checkbox" disabled><span><i>close</i><i>check</i></span>
 	</label>
 	<button class="circle transparent" disabled><i class="large fill">undo</i></button>
@@ -21,7 +21,7 @@
 	<label class="checkbox icon small-padding"><input id="repeat-btn" type="checkbox"><span><i>repeat</i><i>repeat_on</i></span></label>
 	<div class="max"></div>
 	<button id="config-btn" class="circle transparent"><i class="fill">settings</i></button>
-	<button class="circle transparent" disabled><i class="fill">share</i></button>
+	<button id="share-btn" class="circle transparent"><i class="fill">share</i></button>
 </nav></header>
 <div id="overlay" class="overlay"></div>
 <article id="rootmenu" class="pop-up border small-blur absolute margin">
@@ -157,14 +157,20 @@
 		<span id="tone-caption">Yamaha C5, Recorded by Alexander Holm, CC BY 3.0</span>
 	</nav>
 </article>
+<div id="snackbar" class="snackbar primary">
+	<div id="snackbar-text" class="max"></div>
+	<a class="inverse-link">Close</a>
+</div>
 
 <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.10.5/dist/cdn/beer.min.js"></script>
 <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 <script src="https://unpkg.com/tone"></script>
-<script src="./shapes/pincher.js"></script>
+<script src="./shapes/util.js"></script>
 <script src="./shapes/grid.js"></script>
-<script src="./shasav.js"></script>
 <script src="./shapes/note.js"></script>
+<script src="./shapes/serialize.js"></script>
+<script src="./shapes/pincher.js"></script>
 <script src="./shapes/sound.js"></script>
+<script src="./shasav.js"></script>
 </body>
 </html>
