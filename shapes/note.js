@@ -28,7 +28,7 @@ class Note extends Konva.Group {
 			$(`#${this.type}menu`).style.top = this.pitchline.absolutePosition().y + "px"
 			$(`#${this.type}menu`).style.left = e.evt.clientX - $(`#${this.type}menu`).clientWidth / 2 + "px"
 			ui()
-			if (!this.mute) playNotes([{...this.note, time:"0i"}])
+			this.playThis()
 		})
 		
 		this.add(this.pitchline)
@@ -82,6 +82,9 @@ class Note extends Konva.Group {
 	play() {
 		playNotes(this.notes)
 	}
+	playThis() {
+		if (!this.mute) playNotes([{...this.note, time:"0i"}])
+	}
 	del() {
 		this._part?.dispose()
 		this.link?.destroy()
@@ -98,7 +101,6 @@ class RootNote extends Note {
 		}, len, 0, interval)
 		this.type = 'root'
 		this._hz = hz || qb(y2hz(y))
-		playNotes([{...this.note, time:"0i"}])
 		this.root.buildPart()
 
 		this.on('dragstart', e => {
@@ -225,7 +227,6 @@ class SubNote extends Note {
 		this.parentNote = parent
 		this.pitchline.draggable(true)
 		this.quantize()
-		playNotes([{...this.note, time:"0i"}])
 		this.root.buildPart()
 
 		this.pitchline.on('dragstart', e => {
@@ -419,13 +420,15 @@ for (const el of $$('.trans-btn')) {
 for (const el of $$('.root-exp-btn')) {
 	el.addEventListener('click', function(e) {
 		// 自身と所定の音高差を持つnoteを追加する操作
-		stage.current.addNote(stage.current.len, pitchIntervals[($('#root-exp-dir').checked ? '-' : '') + this.innerText])
+		const n = stage.current.addNote(stage.current.len, pitchIntervals[($('#root-exp-dir').checked ? '-' : '') + this.innerText])
+		n.playThis()
 	})
 }
 for (const el of $$('.exp-btn')) {
 	el.addEventListener('click', function(e) {
 		// 自身と所定の音高差を持つnoteを追加する操作
-		stage.current.addNote(stage.current.len, pitchIntervals[($('#exp-dir').checked ? '-' : '') + this.innerText])
+		const n = stage.current.addNote(stage.current.len, pitchIntervals[($('#exp-dir').checked ? '-' : '') + this.innerText])
+		n.playThis()
 	})
 }
 

@@ -24,6 +24,7 @@ stage.on('pointerclick', e => {
 	const pos = stage.getRelativePointerPosition()
 	const root = new RootNote(pos.x, pos.y, 48)
 	rootlayer.add(root)
+	root.playThis()
 	rootlayer.draw()
 })
 
