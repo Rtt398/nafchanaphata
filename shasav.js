@@ -82,7 +82,6 @@ $('#share-btn').addEventListener('click', async e => {
 	const d = await Serializer.serialize()
 	const url = location.origin + location.pathname + '?' + d
 	await navigator.clipboard.writeText(url)
-	$('#snackbar-text').innerText = "コピー完了"
 	ui('#snackbar', 3000)
 })
 

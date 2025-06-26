@@ -22,6 +22,7 @@ class Serializer {
 			l: Math.round(note.len * 4),
 			h: Math.round(note.hz * 16),
 			m: note.mute,
+			v: note.volume - 50,
 			s: note.childNotes.children.map(x => this.sub2json(x))
 		}
 	}
@@ -32,6 +33,7 @@ class Serializer {
 			l: Math.round(note.len * 4),
 			h: Math.round(note._hz * 16),
 			m: note.mute,
+			v: note.volume - 50,
 			s: note.childNotes.children.map(x => this.sub2json(x))
 		}
 	}
@@ -54,6 +56,7 @@ class Serializer {
 	static json2root(n) {
 		const p = new RootNote(n.x / 4 || 0, hz2y(n.h / 16), n.l / 4)
 		p.mute = n.m || false
+		p.volume = 50 + (n.v || 0)
 		rootlayer.add(p)
 		for (const m of n.s || []) {
 			this.json2sub(p, m)
@@ -63,6 +66,7 @@ class Serializer {
 	static json2sub(p, m) {
 		const q = p.addNote(m.l / 4, pitchIntervals[m.i + "d"], m.d / 4 || 0)
 		q.mute = m.m || false
+		q.volume = 50 + (m.v || 0)
 		q.hz = m.h / 16
 		for (const l of m.s || []) {
 			this.json2sub(q, l)

@@ -213,6 +213,7 @@ class RootNote extends Note {
 				note.vol
 			)
 		}, this.notes).start(this.noteHead + "i")
+		this._part.humanize = 0.005 // 最大10ms程度バラつかせる
 		return this._part
 	}
 }
