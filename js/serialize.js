@@ -1,14 +1,18 @@
 
-class Serializer {
-	static async serialize() {
-		const s = {
-			b: $('#config-beat').value,
-			t: $('#config-tonic').value,
+import {$, t2x, x2t, hz2y, pitchIntervals} from './util.js'
+import {RootNote, SubNote} from './note.js'
+import JSONCrush from 'https://unpkg.com/jsoncrush'
+import {stage, grid, rootlayer} from './sequencer.js'
+
+export class Serializer {
+	static serialize(savegrid) {
+		const s = savegrid ? {
+			b: grid.beat,
+			t: grid.tonic,
 			s: x2t(grid.loopStart.x()),
 			e: x2t(grid.loopEnd.x())
-		}
+		} : false
 		const n = rootlayer.children.map(x => this.root2json(x))
-		const JSONCrush = (await import("https://unpkg.com/jsoncrush")).default
 		const c = JSONCrush.crush(JSON.stringify(
 			{s: s, n: n}, 
 			(k, v) => (v.length == 0 || !v) ? undefined : v
@@ -38,28 +42,25 @@ class Serializer {
 		}
 	}
 
-	static async deserialize(d) {
-		const JSONCrush = (await import("https://unpkg.com/jsoncrush")).default
+	static deserialize(d) {
 		const u = JSON.parse(JSONCrush.uncrush(decodeURIComponent(d)))
 		
-		grid.beat = u.s.b
-		grid.tonic = u.s.t
-		grid.loopStart.x(t2x(u.s.s || 0))
-		grid.loopEnd.x(t2x(u.s.e) || 0)
-		grid.setLoop()
+		if (u.s) {
+			grid.beat = u.s.b
+			grid.tonic = u.s.t
+			grid.loopStart.x(t2x(u.s.s || 0))
+			grid.loopEnd.x(t2x(u.s.e) || 0)
+			grid.setLoop()
+		}
 		
 		for (const n of u.n) {
-			this.json2root(n)
-		}
-	}
-
-	static json2root(n) {
-		const p = new RootNote(n.x / 4 || 0, hz2y(n.h / 16), n.l / 4)
-		p.mute = n.m || false
-		p.volume = 50 + (n.v || 0)
-		rootlayer.add(p)
-		for (const m of n.s || []) {
-			this.json2sub(p, m)
+			const p = new RootNote(stage, n.x / 4 || 0, hz2y(n.h / 16), n.l / 4)
+			p.mute = n.m || false
+			p.volume = 50 + (n.v || 0)
+			rootlayer.add(p)
+			for (const m of n.s || []) {
+				this.json2sub(p, m)
+			}
 		}
 	}
 

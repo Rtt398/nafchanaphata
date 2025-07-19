@@ -1,7 +1,12 @@
 
-class Note extends Konva.Group {
-	constructor(opt, len, delay = null, interval = null) {
+import { hz2y, y2hz, x2t, f2d, qb, qs, qh, qt, tav, pitchIntervals, $, $$, OFFSET } from './util.js';
+import { playNotes, sampler } from './sound.js';
+import history from './history.js'
+
+export class Note extends Konva.Group {
+	constructor(stage, opt, len, delay = null, interval = null) {
 		super(opt)
+		this.stage = stage
 		this.pitchline = new Konva.Line({
 			x: delay,
 			y: 0,
@@ -17,9 +22,9 @@ class Note extends Konva.Group {
 		this.isMuted = false
 		
 		this.pitchline.on('pointerclick', e => {
-			if (stage.isDragging() || stage.isPinching || e.evt.button != 0 || stage.isNoteDragging) return
+			if (this.stage.isDragging() || this.stage.isPinching || e.evt.button != 0 || this.stage.isNoteDragging) return
 			e.cancelBubble = true
-			stage.current = this
+			this.stage.current = this
 			$(`#${this.type}hz`).innerText = Math.round(this._hz || this.hz)
 			$(`#${this.type}tav`).innerText = this.tav
 			$(`#${this.type}volume`).value = this.volume
@@ -37,7 +42,7 @@ class Note extends Konva.Group {
 		this.add(this.childNotes)
 	}
 	addNote(len, interval, delay = 0) {
-		const child = new SubNote(delay || this.delay || 0, len, interval, this)
+		const child = new SubNote(this.stage, delay || this.delay || 0, len, interval, this)
 		this.childNotes.add(child)
 		this.childLinks.add(child.link)
 		return child
@@ -92,9 +97,9 @@ class Note extends Konva.Group {
 	}
 }
 
-class RootNote extends Note {
-	constructor(x, y, len, hz, interval) {
-		super({
+export class RootNote extends Note {
+	constructor(stage, x, y, len, hz, interval) {
+		super(stage, {
 			x: qh(x),
 			y: hz2y(qb(y2hz(y))), // || hz2y(hz || prev.hz * interval.n / interval.d),
 			draggable: true
@@ -104,44 +109,67 @@ class RootNote extends Note {
 		this.root.buildPart()
 
 		this.on('dragstart', e => {
+			history.snapshot()
 			const offsetX = this.getRelativePointerPosition().x
 			if (offsetX <= 10 && offsetX <= this.len / 3) {
-				stage.dragMode = 'head'
+				this.stage.dragMode = 'head'
 			} else if (offsetX >= this.len - 10 && offsetX >= 2 * this.len / 3) {
-				stage.dragMode = 'tail'
+				this.stage.dragMode = 'tail'
 			} else {
-				stage.dragMode = 'body'
+				this.stage.dragMode = 'body'
 			}
 			this.origX = this.x()
 			this.origY = this.y()
 			this.origLen = this.len
 			this.origTailX = this.x() + this.len
-			stage.isNoteDragging = true
+			this.stage.isNoteDragging = true
+			if (this.stage.isShiftMode) {
+				for (const n of this.getLayer().getChildren(e => e.x() > this.x())) {
+					n.anchor()
+				}
+			}
 		})
 		.on('dragmove', e => {
-			switch (stage.dragMode) {
+			switch (this.stage.dragMode) {
 				case 'head':
-					// rootの場合、全体が移動・伸縮する
+					// rootの場合、subも移動する
 					this.len = Math.max(10, this.origTailX - qh(this.x()))
 					this.x(qh(this.x()))
 					this.y(this.origY)
 					break
 				case 'tail':
 					// rootのみ伸縮する
-					this.len = Math.max(10, qt(stage.getRelativePointerPosition().x) - this.origX)
+					this.len = Math.max(10, qt(this.stage.getRelativePointerPosition().x) - this.origX)
 					this.x(this.origX)
 					this.y(this.origY)
+					if (this.stage.isShiftMode) {
+						for (const n of this.getLayer().getChildren(e => e.x() > this.x())) {
+							n.shift(this.len - this.origLen)
+						}
+					}
 					break
 				case 'body':
+					// 全体移動
 					this.x(qh(this.x()))
 					this.y(this.y())
 					this.quantize()
+					if (this.stage.isShiftMode) {
+						for (const n of this.getLayer().getChildren(e => e.x() > this.x())) {
+							n.shift(this.x() - this.origX, this.y() - this.origY)
+						}
+					}
 			}
 		})
 		.on('dragend', e => {
-			stage.isNoteDragging = false
+			this.stage.isNoteDragging = false
 			this.hz = y2hz(this.y())
 			this.root.buildPart()
+			if (this.stage.isShiftMode) {
+				for (const n of this.getLayer().getChildren(e => e.x() > this.x())) {
+					n.hz = y2hz(n.y())
+					n.buildPart()
+				}
+			}
 		})
 
 		this.mark = new Konva.RegularPolygon({
@@ -197,6 +225,14 @@ class RootNote extends Note {
 		}
 		this.quantize()
 	}
+	anchor() {
+		this.origX = this.x()
+		this.origY = this.y()
+	}
+	shift (x, y = 0) {
+		this.x(this.origX + x)
+		this.y(this.origY + y)
+	}
 	resolute(n, d) {
 		return [n, d]
 	}
@@ -213,14 +249,14 @@ class RootNote extends Note {
 				note.vol
 			)
 		}, this.notes).start(this.noteHead + "i")
-		this._part.humanize = 0.005 // 最大10ms程度バラつかせる
+		this._part.humanize = ($('#config-humanize').value || 0) / 1000
 		return this._part
 	}
 }
 
-class SubNote extends Note {
-	constructor(delay, len, interval, parent) {
-		super({
+export class SubNote extends Note {
+	constructor(stage, delay, len, interval, parent) {
+		super(stage, {
 			x: 0,
 			y: f2d(interval.n, interval.d)
 		}, len, delay, interval)
@@ -232,23 +268,24 @@ class SubNote extends Note {
 
 		this.pitchline.on('dragstart', e => {
 			e.cancelBubble = true
+			history.snapshot()
 			const offsetX = this.pitchline.getRelativePointerPosition().x
 			if (offsetX <= 10 && offsetX <= this.len / 3) {
-				stage.dragMode = 'head'
+				this.stage.dragMode = 'head'
 			} else if (offsetX >= this.len - 10 && offsetX >= this.len * 2 / 3) {
-				stage.dragMode = 'tail'
+				this.stage.dragMode = 'tail'
 			} else {
-				stage.dragMode = 'body'
+				this.stage.dragMode = 'body'
 			}
 			this.origX = this.pitchline.x()
 			this.origY = this.pitchline.y()
 			this.origLen = this.len
 			this.origTailX = this.pitchline.x() + this.len
-			stage.isNoteDragging = true
+			this.stage.isNoteDragging = true
 		})
 		.on('dragmove', e => {
 			e.cancelBubble = true
-			switch (stage.dragMode) {
+			switch (this.stage.dragMode) {
 				case 'head':
 					// delayの変更(tail固定)
 					this.len = Math.max(10, this.origTailX - qh(this.pitchline.x()))
@@ -298,11 +335,11 @@ class SubNote extends Note {
 	set hz(v) {
 		// 量子化されたhz
 		this._hz = v
-		this.y(hz2y(this._hz) - this.parentNote.getAbsolutePosition(stage).y)
+		this.y(hz2y(this._hz) - this.parentNote.getAbsolutePosition(this.stage).y)
 	}
 	quantize() {
 		this._hz = qs(this.hz)
-		this.y(hz2y(this._hz) - this.parentNote.getAbsolutePosition(stage).y)
+		this.y(hz2y(this._hz) - this.parentNote.getAbsolutePosition(this.stage).y)
 		for (const n of this.childNotes.children) n.quantize()
 	}
 	get interval() {
@@ -346,95 +383,4 @@ class SubNote extends Note {
 			listening: false
 		}
 	}
-}
-
-$('#rootdelete').addEventListener('click', e => {
-	if (stage.current) {
-		stage.current.del()
-		stage.current = undefined
-	}
-	$('#overlay').style.visibility = ''
-	$('#rootmenu').style.top = ''
-})
-
-$('#delete').addEventListener('click', e => {
-	if (stage.current) {
-		stage.current.del()
-		stage.current.root.buildPart()
-		stage.current = undefined
-	}
-	$('#overlay').style.visibility = ''
-	$('#menu').style.top = ''
-})
-
-$('#roothz').addEventListener('blur', e => {
-	const hz = e.target.innerText.replace(/[^0-9.]/g, '')
-	if (hz == '' || hz < 20 || hz > 20000) return e.target.innerText = Math.round(stage.current.hz)
-	e.target.innerText = hz
-	stage.current.hz = hz
-	if ($('#rootmenu').style.top == '') return
-	$('#rootmenu').style.top = stage.current.absolutePosition().y + "px"
-})
-
-$('#rootvolume').addEventListener('change', e => {
-	$('#rootmute').checked = false
-	stage.current.mute = false
-	stage.current.volume = e.target.value
-})
-
-$('#volume').addEventListener('change', e => {
-	$('#mute').checked = false
-	stage.current.mute = false
-	stage.current.volume = e.target.value
-})
-
-for (const el of $$('.mute-btn')) {
-	el.addEventListener('change', function(e) {
-		if (stage.current) {
-			stage.current.mute = this.checked
-			rootlayer.draw()
-		}
-	})
-}
-
-for (const el of $$('.prog-btn')) {
-	el.addEventListener('click', function(e) {
-		// rootの音高を移動させる操作 (0d以外は累積)
-		if (!stage.current) return
-		const shift = pitchIntervals[($('#root-prog-dir').checked ? '-' : '') + this.innerText]
-		const interval = this.innerText == '0d' ? {n: 1, d: 1} : stage.current.interval || {n: 1, d: 1}
-		stage.current.interval = {n: interval.n * shift.n, d: interval.d * shift.d}
-		$('#rootmenu').style.top = stage.current.pitchline.absolutePosition().y + "px"
-		$(`#roothz`).innerText = Math.round(stage.current.hz)
-		$(`#roottav`).innerText = stage.current.tav
-	})
-}
-for (const el of $$('.trans-btn')) {
-	el.addEventListener('click', function(e) {
-		// 自身の音高差を変更する操作 (上書き)
-		stage.current.interval = pitchIntervals[($('#trans-dir').checked ? '-' : '') + this.innerText]
-		$('#menu').style.top = stage.current.pitchline.absolutePosition().y + "px"
-		$(`#hz`).innerText = Math.round(stage.current.hz)
-		$(`#tav`).innerText = stage.current.tav
-	})
-}
-for (const el of $$('.root-exp-btn')) {
-	el.addEventListener('click', function(e) {
-		// 自身と所定の音高差を持つnoteを追加する操作
-		const n = stage.current.addNote(stage.current.len, pitchIntervals[($('#root-exp-dir').checked ? '-' : '') + this.innerText])
-		n.playThis()
-	})
-}
-for (const el of $$('.exp-btn')) {
-	el.addEventListener('click', function(e) {
-		// 自身と所定の音高差を持つnoteを追加する操作
-		const n = stage.current.addNote(stage.current.len, pitchIntervals[($('#exp-dir').checked ? '-' : '') + this.innerText])
-		n.playThis()
-	})
-}
-
-for (const el of $$('.play-this-btn')) {
-	el.addEventListener('click', function(e) {
-		stage.current.root.play()
-	})
 }

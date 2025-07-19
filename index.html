@@ -12,9 +12,9 @@
 <div id="sequencer"></div>
 <header class="absolute bottom responsive max small-blur"><nav class="tiny-space primary-text">
 	<label class="checkbox icon top-padding bottom-padding small-padding">
-		Shift<input type="checkbox" disabled><span><i>close</i><i>check</i></span>
+		Shift<input type="checkbox" id="shift-mode-btn"><span><i>close</i><i>check</i></span>
 	</label>
-	<button class="circle transparent" disabled><i class="large fill">undo</i></button>
+	<button id="undo-btn" class="circle transparent"><i class="large fill">undo</i></button>
 	<div class="max"></div>
 	<button id="stop-btn" class="circle transparent"><i class="large fill">stop</i></button>
 	<button id="play-btn" class="circle transparent small-padding"><i class="huge fill">play_arrow</i></button>
@@ -55,14 +55,14 @@
 	</nav>
 	<nav class="no-space no-margin">
 		<span class="max">［拡張］</span>
-		<button class="root-exp-btn circle transparent shasav">0d</button>
-		<button class="root-exp-btn circle transparent shasav">1d</button>
-		<button class="root-exp-btn circle transparent shasav">2d</button>
-		<button class="root-exp-btn circle transparent shasav">3d</button>
-		<button class="root-exp-btn circle transparent shasav">4d</button>
-		<button class="root-exp-btn circle transparent shasav">5d</button>
+		<button class="root-ext-btn circle transparent shasav">0d</button>
+		<button class="root-ext-btn circle transparent shasav">1d</button>
+		<button class="root-ext-btn circle transparent shasav">2d</button>
+		<button class="root-ext-btn circle transparent shasav">3d</button>
+		<button class="root-ext-btn circle transparent shasav">4d</button>
+		<button class="root-ext-btn circle transparent shasav">5d</button>
 		<label class="checkbox icon left-margin small-margin">
-			<input id="root-exp-dir" type="checkbox"><span><i>north</i><i>south</i></span>
+			<input id="root-ext-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
 	</nav>
 </article>
@@ -97,14 +97,14 @@
 	</nav>
 	<nav class="no-space no-margin">
 		<span class="max">［拡張］</span>
-		<button class="exp-btn circle transparent shasav">0d</button>
-		<button class="exp-btn circle transparent shasav">1d</button>
-		<button class="exp-btn circle transparent shasav">2d</button>
-		<button class="exp-btn circle transparent shasav">3d</button>
-		<button class="exp-btn circle transparent shasav">4d</button>
-		<button class="exp-btn circle transparent shasav">5d</button>
+		<button class="ext-btn circle transparent shasav">0d</button>
+		<button class="ext-btn circle transparent shasav">1d</button>
+		<button class="ext-btn circle transparent shasav">2d</button>
+		<button class="ext-btn circle transparent shasav">3d</button>
+		<button class="ext-btn circle transparent shasav">4d</button>
+		<button class="ext-btn circle transparent shasav">5d</button>
 		<label class="checkbox icon left-margin small-margin">
-			<input id="exp-dir" type="checkbox"><span><i>north</i><i>south</i></span>
+			<input id="ext-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
 	</nav>
 </article>
@@ -130,6 +130,10 @@
 	<nav>
 		<span class="max">　分解能</span>
 		<div class="field prefix suffix small short tick"><a class="disabled">1/</a><input id="config-tick" type="number"><a class="disabled">拍</a></div>
+	</nav>
+	<nav>
+		<span class="max">時刻のランダム化</span>
+		<div class="field prefix suffix small short tick"><a class="disabled">±</a><input id="config-humanize" type="number"><a class="disabled">ms</a></div>
 	</nav>
 	<nav>
 		<span class="max">音高の量子化</span>
@@ -159,18 +163,12 @@
 </article>
 <div id="snackbar" class="snackbar primary">
 	<div id="snackbar-text" class="max">コピー完了</div>
-	<a class="inverse-link">Close</a>
+	<a class="inverse-link"><i>close</i></a>
 </div>
 
 <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.10.5/dist/cdn/beer.min.js"></script>
 <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 <script src="https://unpkg.com/tone"></script>
-<script src="./shapes/util.js"></script>
-<script src="./shapes/grid.js"></script>
-<script src="./shapes/note.js"></script>
-<script src="./shapes/serialize.js"></script>
-<script src="./shapes/pincher.js"></script>
-<script src="./shapes/sound.js"></script>
-<script src="./shasav.js"></script>
+<script type="module" src="./js/shasav.js"></script>
 </body>
 </html>

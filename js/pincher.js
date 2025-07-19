@@ -1,5 +1,5 @@
 
-function makePincher(stage) {
+export function makePincher(stage) {
 	const getDist = (p1, p2) => Math.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2)
 	const getCenter = (p1, p2) => ({x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2})
 

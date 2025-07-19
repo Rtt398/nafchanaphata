@@ -1,7 +1,10 @@
 
-class Grid extends Konva.Layer {
-	constructor(tonic, beat) {
+import { $, range, hz2y, x2t, t2x, f2d, OFFSET } from './util.js'
+
+export class Grid extends Konva.Layer {
+	constructor(stage, tonic, beat) {
 		super() // {listening: false})
+		this.stage = stage
 		this._tonic = tonic
 		this._beat = beat
 		this.octave = f2d(1, 2)
@@ -16,8 +19,8 @@ class Grid extends Konva.Layer {
 		})
 		this.anim = new Konva.Animation(frame => {
 			this.indicator.x(t2x(Tone.Transport.ticks - OFFSET))
-			this.indicator.y(-stage.y() / stage.scaleY())
-			this.indicator.points([0, 0, 0, window.innerHeight / stage.scaleY()])
+			this.indicator.y(-this.stage.y() / this.stage.scaleY())
+			this.indicator.points([0, 0, 0, window.innerHeight / this.stage.scaleY()])
 		})
 		
 		this.loopStart = new Konva.Group({
@@ -32,12 +35,12 @@ class Grid extends Konva.Layer {
 				sides: 3, radius: 5, fill: 'white', rotation: 90
 			})
 		).on('dragstart', e => {
-			stage.isNoteDragging = true
+			this.stage.isNoteDragging = true
 		}).on('dragmove', e => {
 			this.loopStart.x(qh(this.loopStart.x()))
-			this.loopStart.y(-stage.y() / stage.scaleY() + 15)
+			this.loopStart.y(-this.stage.y() / this.stage.scaleY() + 15)
 		}).on('dragend', e => {
-			stage.isNoteDragging = false
+			this.stage.isNoteDragging = false
 			this.setLoop()
 		})
 		this.loopEnd = new Konva.Group({
@@ -52,12 +55,12 @@ class Grid extends Konva.Layer {
 				sides: 3, radius: 5, fill: 'white', rotation: -90
 			})
 		).on('dragstart', e => {
-			stage.isNoteDragging = true
+			this.stage.isNoteDragging = true
 		}).on('dragmove', e => {
 			this.loopEnd.x(qh(this.loopEnd.x()))
-			this.loopEnd.y(-stage.y() / stage.scaleY() + 15)
+			this.loopEnd.y(-this.stage.y() / this.stage.scaleY() + 15)
 		}).on('dragend', e => {
-			stage.isNoteDragging = false
+			this.stage.isNoteDragging = false
 			this.setLoop()
 		})
 		this.setLoop()
@@ -74,7 +77,7 @@ class Grid extends Konva.Layer {
 	set beat(v) {
 		this._beat = v
 		$('#config-beat').value = v
-		grid.drawBeatlines()
+		this.drawBeatlines()
 	}
 	
 	get tonic() {
@@ -83,20 +86,20 @@ class Grid extends Konva.Layer {
 	set tonic(v) {
 		this._tonic = v
 		$('#config-tonic').value = v
-		grid.drawScorelines()
+		this.drawScorelines()
 	}
 	
 	drawScorelines() {
 		this.scorelines.destroyChildren()
 		if (!this.tonic) return
 		// 1D scorelines: tonic^2n
-		const lineCount = Math.ceil(window.innerHeight / stage.scaleY() / this.octave) + 1
+		const lineCount = Math.ceil(window.innerHeight / this.stage.scaleY() / this.octave) + 1
 		
 		for (const i of range(lineCount)) {
 			this.scorelines.add(new Konva.Line({
 				x: 0,
 				y: this.octave * i,
-				points: [0, 0, window.innerWidth / stage.scaleX(), 0],
+				points: [0, 0, window.innerWidth / this.stage.scaleX(), 0],
 				strokeWidth: 3,
 				stroke: '#7e7d93'
 			}))
@@ -104,7 +107,7 @@ class Grid extends Konva.Layer {
 		this.tonicline.setAttrs({
 			x: 0,
 			y: 0,
-			points: [0, 0, window.innerWidth / stage.scaleX(), 0],
+			points: [0, 0, window.innerWidth / this.stage.scaleX(), 0],
 			strokeWidth: 3,
 			stroke: '#b5b4c2'
 		})
@@ -116,13 +119,13 @@ class Grid extends Konva.Layer {
 		if (!this.beat) return
 		// beatlines: beat*n
 		// beatlineは常に48間隔で表示（x-scaling機能が入らない限りは）
-		const lineCount = Math.ceil(window.innerWidth / stage.scaleX() / 48) + 1
+		const lineCount = Math.ceil(window.innerWidth / this.stage.scaleX() / 48) + 1
 		
 		for (const i of range(lineCount)) {
 			this.beatlines.add(new Konva.Line({
 				x: 48 * i,
 				y: 0,
-				points: [0, 0, 0, window.innerHeight / stage.scaleY()],
+				points: [0, 0, 0, window.innerHeight / this.stage.scaleY()],
 				strokeWidth: 1,
 				stroke: '#7e7d93'
 			}))
@@ -134,18 +137,18 @@ class Grid extends Konva.Layer {
 	//位置のみ変更
 	adjust() {
 		const tonicY = hz2y(this.tonic)
-		const top = tonicY - Math.floor((tonicY + stage.y() / stage.scaleY()) / this.octave) * this.octave
-		this.scorelines.x(-stage.x() / stage.scaleX())
-		this.tonicline.x(-stage.x() / stage.scaleX())
+		const top = tonicY - Math.floor((tonicY + this.stage.y() / this.stage.scaleY()) / this.octave) * this.octave
+		this.scorelines.x(-this.stage.x() / this.stage.scaleX())
+		this.tonicline.x(-this.stage.x() / this.stage.scaleX())
 		this.scorelines.y(top)
 		this.tonicline.y(tonicY)
 		
-		const left = Math.floor(-stage.x() / stage.scaleX() / 48) * 48
+		const left = Math.floor(-this.stage.x() / this.stage.scaleX() / 48) * 48
 		this.beatlines.x(left)
-		this.beatlines.y(-stage.y() / stage.scaleY())
+		this.beatlines.y(-this.stage.y() / this.stage.scaleY())
 		
-		this.loopStart.y(-stage.y() / stage.scaleY() + 15)
-		this.loopEnd.y(-stage.y() / stage.scaleY() + 15)
+		this.loopStart.y(-this.stage.y() / this.stage.scaleY() + 15)
+		this.loopEnd.y(-this.stage.y() / this.stage.scaleY() + 15)
 	}
 	
 	showIndicator() {

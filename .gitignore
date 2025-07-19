@@ -1,1 +1,5 @@
+node_modules/
 local_images/
+*.test.js
+vitest.*.js
+package*.json

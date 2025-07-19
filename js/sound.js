@@ -1,5 +1,5 @@
 
-const sampler = new Tone.Sampler({
+export const sampler = new Tone.Sampler({
 	baseUrl: 'sound/salamander/',
 	urls: {
 		A0: 'A0.mp3',A1: 'A1.mp3',A2: 'A2.mp3',A3: 'A3.mp3',A4: 'A4.mp3',A5: 'A5.mp3',A6: 'A6.mp3',A7: 'A7.mp3',
@@ -11,7 +11,7 @@ const sampler = new Tone.Sampler({
 	release: 1.25
 }).toDestination()
 
-function playNotes(notes) {
+export function playNotes(notes) {
 	if (!sampler.loaded) return
 	for (const note of notes) {
 		//console.log('play', note)
