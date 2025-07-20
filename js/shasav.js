@@ -3,6 +3,9 @@ import {$, $$, pitchIntervals} from './util.js';
 import {Serializer} from './serialize.js'
 import history from './history.js'
 import {stage, grid, rootlayer} from './sequencer.js'
+if(location.hostname == 'localhost') {
+	import('./test.js')
+}
 
 Konva.hitOnDragEnabled = true
 scrollTo(0, 0)
@@ -103,12 +106,14 @@ $('#roothz').addEventListener('blur', e => {
 })
 
 $('#rootvolume').addEventListener('change', e => {
+	history.snapshot()
 	$('#rootmute').checked = false
 	stage.current.mute = false
 	stage.current.volume = e.target.value
 })
 
 $('#volume').addEventListener('change', e => {
+	history.snapshot()
 	$('#mute').checked = false
 	stage.current.mute = false
 	stage.current.volume = e.target.value

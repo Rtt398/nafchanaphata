@@ -2,6 +2,7 @@
 import {makePincher} from './pincher.js'
 import {Grid} from './grid.js'
 import {RootNote} from './note.js'
+import history from './history.js'
 
 export const stage = new Konva.Stage({
 	container: 'sequencer',
@@ -19,6 +20,7 @@ stage.add(rootlayer)
 
 stage.on('pointerclick', e => {
 	if (stage.isDragging() || stage.isPinching || e.evt.button != 0 || stage.isNoteDragging) return
+	history.snapshot()
 	const pos = stage.getRelativePointerPosition()
 	const root = new RootNote(stage, pos.x, pos.y, 48)
 	rootlayer.add(root)
