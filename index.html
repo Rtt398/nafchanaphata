@@ -69,8 +69,8 @@
 <article id="menu" class="pop-up border small-blur absolute margin">
 	<nav>
 		<button class="play-this-btn circle transparent primary-text"><i class="large fill">play_arrow</i></button>
-		<span id="hz" class="hz">440Hz</span>
-		<span id="tav" class="max shasav">3d↑</span>
+		<span id="hz" class="hz"></span>
+		<span id="tav" class="max shasav"></span>
 		<button id="delete" class="circle transparent primary-text"><i>delete</i></button>
 	</nav>
 	<nav class="small-margin">
@@ -146,19 +146,21 @@
 	</nav>
 	<nav>
 		<span class="max">　分解能</span>
-		<div class="field prefix suffix small short tick"><a class="disabled">1/</a><input id="config-edo" type="number"><a class="disabled">oct</a></div>
+		<div class="field suffix small short tick"><input id="config-edo" type="number"><a class="disabled">edo</a></div>
 	</nav>
 	<nav class="large-space">
 		<span class="max">音色</span>
 		<div class="field suffix border round small">
-			<select>
-				<option selected value="salamander-piano" data-caption="Yamaha C5, Recorded by Alexander Holm, CC BY 3.0">Salamander Grand Piano</option>
+			<select id="config-tone">
+				<option selected value="salamander-piano" data-caption="Yamaha C5, Alexander Holm, CC BY 3.0">Salamander Grand Piano</option>
+				<option value="vscl-strumstick" data-caption="Versilian Studios LLC, CC0">VSCL Strumstick</option>
+				<option value="vscl-vibraphone" data-caption="Versilian Studios LLC, CC0">VSCL Vibraphone</option>
 			</select>
 			<i>arrow_drop_down</i>
 		</div>
 	</nav>
 	<nav>
-		<span id="tone-caption">Yamaha C5, Recorded by Alexander Holm, CC BY 3.0</span>
+		<span id="tone-caption">Yamaha C5, Alexander Holm, CC BY 3.0</span>
 	</nav>
 </article>
 <div id="snackbar" class="snackbar primary">

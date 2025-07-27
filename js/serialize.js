@@ -10,7 +10,8 @@ export class Serializer {
 			b: grid.beat,
 			t: grid.tonic,
 			s: x2t(grid.loopStart.x()),
-			e: x2t(grid.loopEnd.x())
+			e: x2t(grid.loopEnd.x()),
+			i: $('#config-tone').value
 		} : false
 		const n = rootlayer.children.map(x => this.root2json(x))
 		const c = JSONCrush.crush(JSON.stringify(
@@ -51,6 +52,8 @@ export class Serializer {
 			grid.loopStart.x(t2x(u.s.s || 0))
 			grid.loopEnd.x(t2x(u.s.e) || 0)
 			grid.setLoop()
+			$(`#config-tone>option[value='${u.s.i || "salamander-piano"}']`).selected = true
+			$('#config-tone').dispatchEvent(new Event('change'))
 		}
 		
 		for (const n of u.n) {

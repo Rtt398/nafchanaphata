@@ -37,7 +37,9 @@ examples
 
 ## Acknowledgements
 - 和音図のデザイン・配色は LΛMPLIGHT氏 の資料に基づく（一部簡略化）
-- 音源 [Salamander Piano](https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html) はAlexander Holm氏による
+- 音源
+  - [Salamander Piano](https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html) はAlexander Holm氏による
+  - [Versilian Community Sample Library](https://github.com/sgossner/VCSL/tree/master) はVersilian Studios LLCによる
 - 描画ライブラリとして [Konva.js](https://Konvajs.org) を使用
 - 音声ライブラリとして [Tone.js](https://tonejs.github.io/) を使用
 - UIライブラリとして [Beer.css](https://www.beercss.com/) を使用

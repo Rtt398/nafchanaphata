@@ -2,6 +2,7 @@
 import {$, $$, pitchIntervals} from './util.js';
 import {Serializer} from './serialize.js'
 import history from './history.js'
+import {switchTones} from './sound.js'
 import {stage, grid, rootlayer} from './sequencer.js'
 if(location.hostname == 'localhost') {
 	import('./test.js')
@@ -18,13 +19,9 @@ window.addEventListener('resize', e => {
 	scrollTo(0, 0)
 })
 
-if (location.search !== '') {
-	Serializer.deserialize(location.search.slice(1))
-}
-
-$('#overlay').addEventListener('pointerdown', e => {
+$('#overlay').addEventListener('pointerdown', function(e) {
 	stage.current?.root.buildPart()
-	$('#overlay').style.visibility = ''
+	this.style.visibility = ''
 	for (const i of $$('.pop-up')) i.style.top = ''
 	scrollTo(0, 0)
 })
@@ -35,11 +32,16 @@ $('#config-btn').addEventListener('click', e => {
 	$('#tone-caption').innerText
 })
 
-$('#config-beat').addEventListener('change', e => {
-	grid.beat = $('#config-beat').value
+$('#config-beat').addEventListener('change', function(e) {
+	grid.beat = this.value
 })
-$('#config-tonic').addEventListener('change', e => {
-	grid.tonic = $('#config-tonic').value
+$('#config-tonic').addEventListener('change', function(e) {
+	grid.tonic = this.value
+})
+
+$('#config-tone').addEventListener('change', function(e) {
+	switchTones(this.value)
+	$('#tone-caption').innerText = this.selectedOptions[0].dataset.caption
 })
 
 $('#shift-mode-btn').addEventListener('change', e => {
@@ -62,8 +64,8 @@ $('#stop-btn').addEventListener('click', e => {
 	grid.hideIndicator()
 })
 
-$('#repeat-btn').addEventListener('change', e => {
-	Tone.Transport.loop = $('#repeat-btn').checked
+$('#repeat-btn').addEventListener('change', function(e) {
+	Tone.Transport.loop = this.checked
 })
 
 $('#share-btn').addEventListener('click', async e => {
@@ -173,4 +175,8 @@ for (const el of $$('.play-this-btn')) {
 	el.addEventListener('click', function(e) {
 		stage.current.root.play()
 	})
+}
+
+if (location.search !== '') {
+	Serializer.deserialize(location.search.slice(1))
 }

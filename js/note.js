@@ -242,6 +242,7 @@ export class RootNote extends Note {
 	buildPart() {
 		this._part?.dispose()
 		this._part = new Tone.Part((time, note) => {
+			if (!sampler.loaded) return
 			sampler.triggerAttackRelease(
 				note.hz,
 				note.len,
