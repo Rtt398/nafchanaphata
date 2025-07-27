@@ -14,7 +14,7 @@ function tones(tone) {
 				},
 				release: 1.25
 			})
-		case 'vscl-strumstick':
+		case 'vcsl-strumstick':
 			return new Tone.Sampler({
 				baseUrl: 'sound/strumstick/',
 				urls: {
@@ -24,7 +24,7 @@ function tones(tone) {
 				},
 				release: 1.25
 			})
-		case 'vscl-vibraphone':
+		case 'vcsl-vibraphone':
 			return new Tone.Sampler({
 				baseUrl: 'sound/vibraphone/',
 				urls: {
