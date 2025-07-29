@@ -42,7 +42,7 @@
 		</label>
 	</nav>
 	<nav class="no-margin no-space">
-		<span class="max">［進行］</span>
+		<span class="max" data-i18n="prog">［進行］</span>
 		<button class="prog-btn circle transparent shasav">0d</button>
 		<button class="prog-btn circle transparent shasav">1d</button>
 		<button class="prog-btn circle transparent shasav">2d</button>
@@ -54,7 +54,7 @@
 		</label>
 	</nav>
 	<nav class="no-space no-margin">
-		<span class="max">［拡張］</span>
+		<span class="max" data-i18n="ext">［拡張］</span>
 		<button class="root-ext-btn circle transparent shasav">0d</button>
 		<button class="root-ext-btn circle transparent shasav">1d</button>
 		<button class="root-ext-btn circle transparent shasav">2d</button>
@@ -84,7 +84,7 @@
 		</label>
 	</nav>
 	<nav class="no-margin no-space">
-		<span class="max">［転写］</span>
+		<span class="max" data-i18n="trans">［転写］</span>
 		<button class="trans-btn circle transparent shasav">0d</button>
 		<button class="trans-btn circle transparent shasav">1d</button>
 		<button class="trans-btn circle transparent shasav">2d</button>
@@ -96,7 +96,7 @@
 		</label>
 	</nav>
 	<nav class="no-space no-margin">
-		<span class="max">［拡張］</span>
+		<span class="max" data-i18n="ext">［拡張］</span>
 		<button class="ext-btn circle transparent shasav">0d</button>
 		<button class="ext-btn circle transparent shasav">1d</button>
 		<button class="ext-btn circle transparent shasav">2d</button>
@@ -109,47 +109,58 @@
 	</nav>
 </article>
 <article id="config" class="pop-up blur absolute large-padding">
-	<h4>設定</h4>
+	<h4 data-i18n="config">設定</h4>
 	<nav>
-		<span class="max">1拍の長さ</span>
+		<span class="max" data-i18n="lang">言語</span>
+		<div class="field suffix border round small">
+			<select id="config-lang">
+				<option selected value="ja">日本語</option>
+				<option value="en">English</option>
+				<option value="sf">Shafcyk</option>
+			</select>
+			<i>arrow_drop_down</i>
+		</div>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="beat-length">1拍の長さ</span>
 		<div class="field suffix small short tempo"><input id="config-beat" type="number"><a class="disabled">ms</a></div>
 	</nav>
 	<nav>
-		<span class="max">基準音高</span>
+		<span class="max" data-i18n="tonic">基準音高</span>
 		<div class="field suffix small short tempo"><input id="config-tonic" type="number"><a class="disabled">Hz</a></div>
 	</nav>
 	<nav>
-		<span class="max">時刻の量子化</span>
+		<span class="max" data-i18n="time-quantize">時刻の量子化</span>
 		<label class="checkbox">
-			<input id="config-quantize-head" type="checkbox"><span>先頭</span>
+			<input id="config-quantize-head" type="checkbox"><span data-i18n="head">先頭</span>
 		</label>
 		<label class="checkbox">
-			<input id="config-quantize-tail" type="checkbox"><span>末尾</span>
+			<input id="config-quantize-tail" type="checkbox"><span data-i18n="tail">末尾</span>
 		</label>
 	</nav>
 	<nav>
-		<span class="max">　分解能</span>
-		<div class="field prefix suffix small short tick"><a class="disabled">1/</a><input id="config-tick" type="number"><a class="disabled">拍</a></div>
+		<span class="max" data-i18n="quantize">　分解能</span>
+		<div class="field prefix suffix small short tick"><a class="disabled">1/</a><input id="config-tick" type="number"><a class="disabled" data-i18n="beat">拍</a></div>
 	</nav>
 	<nav>
-		<span class="max">時刻のランダム化</span>
+		<span class="max" data-i18n="time-randomize">時刻のランダム化</span>
 		<div class="field prefix suffix small short tick"><a class="disabled">±</a><input id="config-humanize" type="number"><a class="disabled">ms</a></div>
 	</nav>
 	<nav>
-		<span class="max">音高の量子化</span>
+		<span class="max" data-i18n="pitch-quantize">音高の量子化</span>
 		<label class="checkbox">
-			<input id="config-quantize-base" type="checkbox" name="quantize"><span>底音</span>
+			<input id="config-quantize-base" type="checkbox" name="quantize"><span data-i18n="base-note">底音</span>
 		</label>
 		<label class="checkbox">
-			<input id="config-quantize-sub" type="checkbox" name="quantize"><span>その他</span>
+			<input id="config-quantize-sub" type="checkbox" name="quantize"><span data-i18n="other-note">その他</span>
 		</label>
 	</nav>
 	<nav>
-		<span class="max">　分解能</span>
+		<span class="max" data-i18n="quantize">　分解能</span>
 		<div class="field suffix small short tick"><input id="config-edo" type="number"><a class="disabled">edo</a></div>
 	</nav>
 	<nav class="large-space">
-		<span class="max">音色</span>
+		<span class="max" data-i18n="tone">音色</span>
 		<div class="field suffix border round small">
 			<select id="config-tone">
 				<option selected value="salamander-piano" data-caption="Yamaha C5, Alexander Holm, CC BY 3.0">Salamander Grand Piano</option>
@@ -164,7 +175,7 @@
 	</nav>
 </article>
 <div id="snackbar" class="snackbar primary">
-	<div id="snackbar-text" class="max">コピー完了</div>
+	<div id="snackbar-text" class="max" data-i18n="copy-finish">コピー完了</div>
 	<a class="inverse-link"><i>close</i></a>
 </div>
 

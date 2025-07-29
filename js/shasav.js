@@ -4,9 +4,12 @@ import {Serializer} from './serialize.js'
 import history from './history.js'
 import {switchTones} from './sound.js'
 import {stage, grid, rootlayer} from './sequencer.js'
+import {i18n} from './i18n.js'
 if(location.hostname == 'localhost') {
 	import('./test.js')
 }
+
+i18n(navigator.language == 'ja' ? 'ja' : 'en') 
 
 Konva.hitOnDragEnabled = true
 scrollTo(0, 0)
@@ -30,6 +33,10 @@ $('#config-btn').addEventListener('click', e => {
 	$(`#overlay`).style.visibility = "visible"
 	$('#config').style.top = '1.5rem'
 	$('#tone-caption').innerText
+})
+
+$('#config-lang').addEventListener('change', function(e) {
+	i18n(this.value)
 })
 
 $('#config-beat').addEventListener('change', function(e) {
