@@ -1,4 +1,4 @@
-import {$$} from './util.js'
+import {$, $$} from './util.js'
 
 export function i18n(lang) {
 	const d = tr[lang]
@@ -6,6 +6,7 @@ export function i18n(lang) {
 	for (const elm of $$('[data-i18n]')) {
 		elm.innerText = d[elm.dataset.i18n]
 	}
+	$('html').lang = lang
 }
 
 const tr = {
@@ -16,11 +17,11 @@ const tr = {
 		"config": "設定",
 		"lang": "言語",
 		"beat-length": "1拍の長さ",
-		"tonic": "基準音高",
+		"tonic": "主音",
 		"time-quantize": "時刻の量子化",
 		"head": "先頭",
 		"tail": "末尾",
-		"quantize": "　分解能",
+		"resolution": "　分解能",
 		"beat": "拍",
 		"time-randomize": "時刻のランダム化",
 		"pitch-quantize": "音高の量子化",
@@ -36,16 +37,16 @@ const tr = {
 		"config": "Config",
 		"lang": "Language",
 		"beat-length": "Beat Length",
-		"tonic": "Tonic Pitch",
-		"time-quantize": "Quantize Time",
+		"tonic": "Tonic",
+		"time-quantize": "Quantize Timing",
 		"head": "Head",
 		"tail": "Tail",
-		"quantize": "　Resolution",
+		"resolution": "　Resolution",
 		"beat": "beat",
-		"time-randomize": "Randamize Time",
+		"time-randomize": "Randamize Timing",
 		"pitch-quantize": "Quantize Pitch",
-		"base-note": "Base",
-		"other-note": "Other",
+		"base-note": "Base Notes",
+		"other-note": "Others",
 		"tone": "Instrument",
 		"copy-finish": "Copied"
 	},
@@ -55,18 +56,18 @@ const tr = {
 		"trans": "[Blanascäzc]",
 		"config": "Ftutzc",
 		"lang": "Kytcyk",
-		"beat-length": "Pyt Matia",
-		"tonic": "Atphaclava",
-		"time-quantize": "Tarcfanäzc Spus",
-		"head": "Yuna",
-		"tail": "Canol",
-		"quantize": "　Clycertnakyx",
-		"beat": "pyt",
-		"time-randomize": "Choschta Spus",
-		"pitch-quantize": "Tarcfanäzc Clava",
-		"base-note": "Lystalipa",
-		"other-note": "Fynäska",
-		"tone": "Vlesyvo",
-		"copy-finish": "Chlocle"
+		"beat-length": "Pytrå smot",
+		"tonic": "Mysalipa",
+		"time-quantize": "Xernå tarcfanäzc",
+		"head": "Yunam",
+		"tail": "Tainam",
+		"resolution": "　Clycertnakyx",
+		"beat": "pyt’",
+		"time-randomize": "Xernå chaschlaväzc",
+		"pitch-quantize": "Clavany tarcfanäzc",
+		"base-note": "Lystalipam",
+		"other-note": "Fynächam",
+		"tone": "Vlesyvom",
+		"copy-finish": "Na chlacrapham"
 	},
 }
