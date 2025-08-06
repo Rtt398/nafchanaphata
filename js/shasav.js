@@ -1,15 +1,19 @@
 
-import {$, $$, pitchIntervals} from './util.js';
-import {Serializer} from './serialize.js'
-import history from './history.js'
-import {switchTones} from './sound.js'
-import {stage, grid, rootlayer} from './sequencer.js'
-import {i18n} from './i18n.js'
-if(location.hostname == 'localhost') {
+import { $, $$, pitchIntervals } from './util.js';
+import { Serializer } from './serialize.js';
+import history from './history.js';
+import { switchTones } from './sound.js';
+import { stage, grid, rootlayer } from './sequencer.js';
+import { i18n } from './i18n.js';
+import { bindKeys } from './keybinds.js';
+
+bindKeys();
+
+if (location.hostname == 'localhost') {
 	import('./test.js')
 }
 
-i18n(navigator.language == 'ja' ? 'ja' : 'en') 
+i18n(navigator.language == 'ja' ? 'ja' : 'en')
 
 Konva.hitOnDragEnabled = true
 scrollTo(0, 0)
@@ -144,8 +148,8 @@ for (const el of $$('.prog-btn')) {
 		if (!stage.current) return
 		history.snapshot()
 		const shift = pitchIntervals[($('#root-prog-dir').checked ? '-' : '') + this.innerText]
-		const interval = this.innerText == '0d' ? {n: 1, d: 1} : stage.current.interval || {n: 1, d: 1}
-		stage.current.interval = {n: interval.n * shift.n, d: interval.d * shift.d}
+		const interval = this.innerText == '0d' ? { n: 1, d: 1 } : stage.current.interval || { n: 1, d: 1 }
+		stage.current.interval = { n: interval.n * shift.n, d: interval.d * shift.d }
 		$('#rootmenu').style.top = stage.current.pitchline.absolutePosition().y + "px"
 		$(`#roothz`).innerText = Math.round(stage.current.hz)
 		$(`#roottav`).innerText = stage.current.tav
