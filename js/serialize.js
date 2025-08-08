@@ -16,7 +16,7 @@ export class Serializer {
 		const n = rootlayer.children.map(x => this.root2json(x))
 		const c = JSONCrush.crush(JSON.stringify(
 			{s: s, n: n}, 
-			(k, v) => (v.length == 0 || !v) ? undefined : v
+			(k, v) => (!v || v.length == 0) ? undefined : v
 		))
 		return encodeURIComponent(c)
 	}
@@ -45,6 +45,7 @@ export class Serializer {
 
 	static deserialize(d) {
 		const u = JSON.parse(JSONCrush.uncrush(decodeURIComponent(d)))
+		console.log("loading", u)
 		
 		if (u.s) {
 			grid.beat = u.s.b
@@ -68,10 +69,10 @@ export class Serializer {
 	}
 
 	static json2sub(p, m) {
-		const q = p.addNote(m.l / 4, pitchIntervals[m.i + "d"], m.d / 4 || 0)
+		const q = p.addNote(m.l / 4, pitchIntervals[m.i + "d"], m.d / 4 || 0, false)
 		q.mute = m.m || false
 		q.volume = 50 + (m.v || 0)
-		q.hz = m.h / 16
+		if (m.h) q.hz = m.h / 16
 		for (const l of m.s || []) {
 			this.json2sub(q, l)
 		}

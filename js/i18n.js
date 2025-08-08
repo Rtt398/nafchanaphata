@@ -36,7 +36,7 @@ const tr = {
 		"trans": "[Translate]",
 		"config": "Config",
 		"lang": "Language",
-		"beat-length": "Beat Length",
+		"beat-length": "Beat Duration",
 		"tonic": "Tonic",
 		"time-quantize": "Quantize Timing",
 		"head": "Head",

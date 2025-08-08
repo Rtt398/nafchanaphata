@@ -48,7 +48,7 @@ $('#config-tonic').addEventListener('change', function(e) {
 
 $('#config-tone').addEventListener('change', function(e) {
 	switchTones(this.value)
-	$('#tone-caption').innerText = this.selectedOptions[0].dataset.caption
+	$('#tone-caption').innerText = "　" + this.selectedOptions[0].dataset.caption
 })
 
 $('#shift-mode-btn').addEventListener('change', e => {

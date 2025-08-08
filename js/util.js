@@ -6,20 +6,23 @@ export const gcd = (a, b) => {
 	return (b === 0) ? a : gcd(b, a % b)
 }
 export const pitchIntervals = {
-	'0d': {id: 0, n: 1, d:  1, c: '#aaaaaa', w: 1, b: 0.5, t: 0.5},
-	'1d': {id: 1, n: 2, d:  1, c: '#aaaaaa', w: 3, b: 0.5, t: 0.5},
-	'2d': {id: 2, n: 3, d:  2, c: '#f27999', w: 7, b: 0, t: 0},
-	'3d': {id: 3, n: 5, d:  4, c: '#6cd985', w: 7, b: 1, t: 1},
-	'4d': {id: 4, n: 7, d:  4, c: '#b598ee', w: 7, b: 0, t: 1},
-	'5d': {id: 5, n: 11, d: 4, c: '#ffc247', w: 7, b: 1, t: 0},
-	'6d': {id: 6, n: 13, d: 4, c: '#b5b500', w: 7, b: 0.5, t: 0.5},
-	'-0d': {id: 0, n: 1, d:  1, c: '#aaaaaa', w: 1, b: 0.5, t: 0.5},
-	'-1d': {id: -1, n: 1, d:  2, c: '#aaaaaa', w: 3, b: 0.5, t: 0.5},
-	'-2d': {id: -2, n: 2, d:  3, c: '#f27999', w: 7, b: 0, t: 0},
-	'-3d': {id: -3, n: 4, d:  5, c: '#6cd985', w: 7, b: 1, t: 1},
-	'-4d': {id: -4, n: 4, d:  7, c: '#b598ee', w: 7, b: 1, t: 0},
-	'-5d': {id: -5, n: 4, d: 11, c: '#ffc247', w: 7, b: 0, t: 1},
-	'-6d': {id: -6, n: 4, d: 13, c: '#b5b500', w: 7, b: 0.5, t: 0.5}
+	// pitch: n/d, linestyle: {color, width}, position: {bottom - top}, curve: {middle}
+	'0d':  {id:  0, n:  1, d:  1, c: '#aaaaaa', w: 1, b: 0.5, t: 0.5, m:   0},
+	'1d':  {id:  1, n:  2, d:  1, c: '#aaaaaa', w: 3, b: 0.5, t: 0.5, m:   0},
+	'2d':  {id:  2, n:  3, d:  2, c: '#f27999', w: 7, b: 0  , t: 0  , m:   0},
+	'3d':  {id:  3, n:  5, d:  4, c: '#6cd985', w: 7, b: 1  , t: 1  , m:   0},
+	'4d':  {id:  4, n:  7, d:  4, c: '#b598ee', w: 7, b: 0  , t: 1  , m:   0},
+	'5d':  {id:  5, n: 11, d:  4, c: '#ffc247', w: 7, b: 1  , t: 0  , m:   0},
+	'6d':  {id:  6, n: 13, d:  4, c: '#b5b500', w: 7, b: 0  , t: 0  , m: -10},
+	'7d':  {id:  6, n: 17, d:  4, c: '#ed9877', w: 7, b: 1  , t: 1  , m:  10},
+	'-0d': {id:  0, n:  1, d:  1, c: '#aaaaaa', w: 1, b: 0.5, t: 0.5, m:   0},
+	'-1d': {id: -1, n:  1, d:  2, c: '#aaaaaa', w: 3, b: 0.5, t: 0.5, m:   0},
+	'-2d': {id: -2, n:  2, d:  3, c: '#f27999', w: 7, b: 0  , t: 0  , m:   0},
+	'-3d': {id: -3, n:  4, d:  5, c: '#6cd985', w: 7, b: 1  , t: 1  , m:   0},
+	'-4d': {id: -4, n:  4, d:  7, c: '#b598ee', w: 7, b: 1  , t: 0  , m:   0},
+	'-5d': {id: -5, n:  4, d: 11, c: '#ffc247', w: 7, b: 0  , t: 1  , m:   0},
+	'-6d': {id: -6, n:  4, d: 13, c: '#b5b500', w: 7, b: 0  , t: 0  , m: -10}
+	'-7d': {id: -6, n:  4, d: 17, c: '#ed9877', w: 7, b: 1  , t: 1  , m:  10}
 }
 export const hz2y = hz => (Math.log2(20000) - Math.log2(hz)) * 100 || undefined
 export const y2hz = y => 20000 / 2**(y/100) || undefined

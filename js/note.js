@@ -41,8 +41,8 @@ export class Note extends Konva.Group {
 		this.childLinks = new Konva.Group()
 		this.add(this.childNotes)
 	}
-	addNote(len, interval, delay = 0) {
-		history.snapshot()
+	addNote(len, interval, delay = 0, snapshot = true) {
+		if (snapshot) history.snapshot()
 		const child = new SubNote(this.stage, delay || this.delay || 0, len, interval, this)
 		this.childNotes.add(child)
 		this.childLinks.add(child.link)
