@@ -41,8 +41,7 @@ export class Note extends Konva.Group {
 		this.childLinks = new Konva.Group()
 		this.add(this.childNotes)
 	}
-	addNote(len, interval, delay = 0, snapshot = true) {
-		if (snapshot) history.snapshot()
+	addNote(len, interval, delay = 0) {
 		const child = new SubNote(this.stage, delay || this.delay || 0, len, interval, this)
 		this.childNotes.add(child)
 		this.childLinks.add(child.link)
@@ -296,7 +295,7 @@ export class SubNote extends Note {
 					break
 				case 'tail':
 					// lenの変更
-					this.len = Math.max(10, qh(this.link.getRelativePointerPosition().x) - this.origX)
+					this.len = Math.max(10, qt(this.link.getRelativePointerPosition().x) - this.origX)
 					this.pitchline.x(this.origX)
 					this.pitchline.y(0)
 					break
@@ -363,9 +362,9 @@ export class SubNote extends Note {
 	}
 	get clip() {
 		return {
-			x: this.delay,
+			x: this.delay + this.interval.m,
 			y: this.interval.n > this.interval.d ? -1.5 : 1.5,
-			width: this.len,
+			width: this.len + Math.abs(this.interval.m) * 2,
 			height: f2d(this.interval.d, this.interval.n) + (this.interval.n > this.interval.d ? 3 : -3)
 		}
 	}
@@ -376,10 +375,13 @@ export class SubNote extends Note {
 			points: [
 				Math.sign(this.interval.t - 0.5) * - this.interval.w / 2,
 				0,
+				(this.len * (this.interval.b - this.interval.t) + (Math.sign(this.interval.t - 0.5) + Math.sign(this.interval.b - 0.5)) * - this.interval.w / 2) / 2 + this.interval.m,
+				f2d(this.interval.d, this.interval.n) / 2,
 				this.len * (this.interval.b - this.interval.t) + Math.sign(this.interval.b - 0.5) * - this.interval.w / 2,
 				f2d(this.interval.d, this.interval.n)
 			],
 			lineCap: 'square',
+			tension: 0.5,
 			stroke: this.interval.c,
 			strokeWidth: this.interval.w,
 			listening: false

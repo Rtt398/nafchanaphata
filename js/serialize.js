@@ -56,7 +56,7 @@ export class Serializer {
 			$(`#config-tone>option[value='${u.s.i || "salamander-piano"}']`).selected = true
 			$('#config-tone').dispatchEvent(new Event('change'))
 		}
-		
+		if (!u.n) return
 		for (const n of u.n) {
 			const p = new RootNote(stage, n.x / 4 || 0, hz2y(n.h / 16), n.l / 4)
 			p.mute = n.m || false
@@ -69,7 +69,7 @@ export class Serializer {
 	}
 
 	static json2sub(p, m) {
-		const q = p.addNote(m.l / 4, pitchIntervals[m.i + "d"], m.d / 4 || 0, false)
+		const q = p.addNote(m.l / 4, pitchIntervals[m.i + "d"], m.d / 4 || 0)
 		q.mute = m.m || false
 		q.volume = 50 + (m.v || 0)
 		if (m.h) q.hz = m.h / 16

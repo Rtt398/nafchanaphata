@@ -9,20 +9,20 @@ export const pitchIntervals = {
 	// pitch: n/d, linestyle: {color, width}, position: {bottom - top}, curve: {middle}
 	'0d':  {id:  0, n:  1, d:  1, c: '#aaaaaa', w: 1, b: 0.5, t: 0.5, m:   0},
 	'1d':  {id:  1, n:  2, d:  1, c: '#aaaaaa', w: 3, b: 0.5, t: 0.5, m:   0},
-	'2d':  {id:  2, n:  3, d:  2, c: '#f27999', w: 7, b: 0  , t: 0  , m:   0},
+	'2d':  {id:  2, n:  3, d:  2, c: '#f27992', w: 7, b: 0  , t: 0  , m:   0},
 	'3d':  {id:  3, n:  5, d:  4, c: '#6cd985', w: 7, b: 1  , t: 1  , m:   0},
 	'4d':  {id:  4, n:  7, d:  4, c: '#b598ee', w: 7, b: 0  , t: 1  , m:   0},
 	'5d':  {id:  5, n: 11, d:  4, c: '#ffc247', w: 7, b: 1  , t: 0  , m:   0},
-	'6d':  {id:  6, n: 13, d:  4, c: '#b5b500', w: 7, b: 0  , t: 0  , m: -10},
-	'7d':  {id:  6, n: 17, d:  4, c: '#ed9877', w: 7, b: 1  , t: 1  , m:  10},
+	'6d':  {id:  6, n: 13, d:  4, c: '#b5b500', w: 7, b: 0  , t: 0  , m: -16},
+	'7d':  {id:  7, n: 17, d:  4, c: '#ed9877', w: 7, b: 1  , t: 1  , m:  16},
 	'-0d': {id:  0, n:  1, d:  1, c: '#aaaaaa', w: 1, b: 0.5, t: 0.5, m:   0},
 	'-1d': {id: -1, n:  1, d:  2, c: '#aaaaaa', w: 3, b: 0.5, t: 0.5, m:   0},
-	'-2d': {id: -2, n:  2, d:  3, c: '#f27999', w: 7, b: 0  , t: 0  , m:   0},
+	'-2d': {id: -2, n:  2, d:  3, c: '#f27992', w: 7, b: 0  , t: 0  , m:   0},
 	'-3d': {id: -3, n:  4, d:  5, c: '#6cd985', w: 7, b: 1  , t: 1  , m:   0},
 	'-4d': {id: -4, n:  4, d:  7, c: '#b598ee', w: 7, b: 1  , t: 0  , m:   0},
 	'-5d': {id: -5, n:  4, d: 11, c: '#ffc247', w: 7, b: 0  , t: 1  , m:   0},
-	'-6d': {id: -6, n:  4, d: 13, c: '#b5b500', w: 7, b: 0  , t: 0  , m: -10}
-	'-7d': {id: -6, n:  4, d: 17, c: '#ed9877', w: 7, b: 1  , t: 1  , m:  10}
+	'-6d': {id: -6, n:  4, d: 13, c: '#b5b500', w: 7, b: 0  , t: 0  , m: -16},
+	'-7d': {id: -7, n:  4, d: 17, c: '#ed9877', w: 7, b: 1  , t: 1  , m:  16}
 }
 export const hz2y = hz => (Math.log2(20000) - Math.log2(hz)) * 100 || undefined
 export const y2hz = y => 20000 / 2**(y/100) || undefined
@@ -33,7 +33,7 @@ export const tav = (n, d) => {
 	;[n, d] = [n, d].map(x => x / gcd(n, d))
 	if (n == 1 && d == 1) return '0d'
 	let res = ""
-	for (const [i, v, u] of [[6,13,4],[5,11,4],[4,7,4],[3,5,4],[2,3,2],[1,2,1]]) {
+	for (const [i, v, u] of [[7,17,4],[6,13,4],[5,11,4],[4,7,4],[3,5,4],[2,3,2],[1,2,1]]) {
 		let t = -1
 		while (n % v**(++t+1) == 0) {}
 		if (t) res = `${i}d${'↑'.repeat(t)}${res}`
@@ -45,7 +45,7 @@ export const tav = (n, d) => {
 		d /= v**t / u**t
 		;[n, d] = [n, d].map(x => x / gcd(n, d))
 	}
-	if (n > 1 || d > 1) console.log(`警告：7次元以上の残余: ${n}/${d}`)
+	if (n > 1 || d > 1) console.log(`警告：8次元以上の残余: ${n}/${d}`)
 	return res
 }
 export const qb = hz => {

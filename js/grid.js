@@ -10,6 +10,7 @@ export class Grid extends Konva.Layer {
 		this.octave = f2d(1, 2)
 		
 		this.scorelines = new Konva.Group()
+		this.scorelines2 = new Konva.Group()
 		this.beatlines = new Konva.Group()
 		this.tonicline = new Konva.Line()
 		
@@ -65,7 +66,7 @@ export class Grid extends Konva.Layer {
 		})
 		this.setLoop()
 		
-		this.add(this.scorelines, this.beatlines, this.tonicline, this.indicator, this.loopEnd, this.loopStart)
+		this.add(this.scorelines2, this.scorelines, this.beatlines, this.tonicline, this.indicator, this.loopEnd, this.loopStart)
 		this.drawScorelines()
 		this.drawBeatlines()
 		this.adjust()
@@ -91,19 +92,37 @@ export class Grid extends Konva.Layer {
 	
 	drawScorelines() {
 		this.scorelines.destroyChildren()
+		this.scorelines2.destroyChildren()
 		if (!this.tonic) return
-		// 1D scorelines: tonic^2n
-		const lineCount = Math.ceil(window.innerHeight / this.stage.scaleY() / this.octave) + 1
 		
-		for (const i of range(lineCount)) {
-			this.scorelines.add(new Konva.Line({
-				x: 0,
-				y: this.octave * i,
-				points: [0, 0, window.innerWidth / this.stage.scaleX(), 0],
-				strokeWidth: 3,
-				stroke: '#7e7d93'
-			}))
+		if ($('#config-scoreline-1d').checked) {
+			// 1D scorelines: tonic^2n
+			const lineCount = Math.ceil(window.innerHeight / this.stage.scaleY() / this.octave) + 1
+			for (const i of range(lineCount)) {
+				this.scorelines.add(new Konva.Line({
+					x: 0,
+					y: this.octave * i,
+					points: [0, 0, window.innerWidth / this.stage.scaleX(), 0],
+					strokeWidth: 3,
+					stroke: '#7e7d93'
+				}))
+			}
 		}
+		
+		if ($('#config-scoreline-2d').checked) {
+			// 2D scoreline: tonic^(3/2)
+			const lineCount2 = Math.ceil(window.innerHeight / this.stage.scaleY() / f2d(2, 3)) + 1
+			for (const i of range(lineCount2)) {
+				this.scorelines2.add(new Konva.Line({
+					x: 0,
+					y: f2d(2, 3) * i,
+					points: [0, 0, window.innerWidth / this.stage.scaleX(), 0],
+					strokeWidth: 3,
+					stroke: '#8c6f88'
+				}))
+			}
+		}
+		
 		this.tonicline.setAttrs({
 			x: 0,
 			y: 0,
@@ -138,9 +157,12 @@ export class Grid extends Konva.Layer {
 	adjust() {
 		const tonicY = hz2y(this.tonic)
 		const top = tonicY - Math.floor((tonicY + this.stage.y() / this.stage.scaleY()) / this.octave) * this.octave
+		const top2 = tonicY - Math.floor((tonicY + this.stage.y() / this.stage.scaleY()) / f2d(2, 3)) * f2d(2, 3)
 		this.scorelines.x(-this.stage.x() / this.stage.scaleX())
+		this.scorelines2.x(-this.stage.x() / this.stage.scaleX())
 		this.tonicline.x(-this.stage.x() / this.stage.scaleX())
 		this.scorelines.y(top)
+		this.scorelines2.y(top2)
 		this.tonicline.y(tonicY)
 		
 		const left = Math.floor(-this.stage.x() / this.stage.scaleX() / 48) * 48

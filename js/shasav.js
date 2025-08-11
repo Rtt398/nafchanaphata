@@ -49,6 +49,24 @@ $('#config-beat').addEventListener('change', function(e) {
 $('#config-tonic').addEventListener('change', function(e) {
 	grid.tonic = this.value
 })
+$('#config-scoreline-1d').addEventListener('change', function(e) {
+	grid.drawScorelines()
+})
+$('#config-scoreline-2d').addEventListener('change', function(e) {
+	grid.drawScorelines()
+})
+$('#config-enable-6d').addEventListener('change', function(e) {
+	for (const i of $$('.btn-6d')) {
+		i.style.display = this.checked ? "unset" : ""
+	}
+})
+$('#config-enable-7d').addEventListener('change', function(e) {
+	for (const i of $$('.btn-7d')) {
+		i.style.display = this.checked ? "unset" : ""
+	}
+})
+
+
 
 $('#config-tone').addEventListener('change', function(e) {
 	switchTones(this.value)

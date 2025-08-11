@@ -49,6 +49,8 @@
 		<button class="prog-btn circle transparent shasav">3d</button>
 		<button class="prog-btn circle transparent shasav">4d</button>
 		<button class="prog-btn circle transparent shasav">5d</button>
+		<button class="prog-btn circle transparent shasav btn-6d">6d</button>
+		<button class="prog-btn circle transparent shasav btn-7d">7d</button>
 		<label class="checkbox icon left-margin small-margin">
 			<input id="root-prog-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
@@ -61,6 +63,8 @@
 		<button class="root-ext-btn circle transparent shasav">3d</button>
 		<button class="root-ext-btn circle transparent shasav">4d</button>
 		<button class="root-ext-btn circle transparent shasav">5d</button>
+		<button class="root-ext-btn circle transparent shasav btn-6d">6d</button>
+		<button class="root-ext-btn circle transparent shasav btn-7d">7d</button>
 		<label class="checkbox icon left-margin small-margin">
 			<input id="root-ext-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
@@ -91,6 +95,8 @@
 		<button class="trans-btn circle transparent shasav">3d</button>
 		<button class="trans-btn circle transparent shasav">4d</button>
 		<button class="trans-btn circle transparent shasav">5d</button>
+		<button class="trans-btn circle transparent shasav btn-6d">6d</button>
+		<button class="trans-btn circle transparent shasav btn-7d">7d</button>
 		<label class="checkbox icon left-margin small-margin">
 			<input id="trans-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
@@ -103,6 +109,8 @@
 		<button class="ext-btn circle transparent shasav">3d</button>
 		<button class="ext-btn circle transparent shasav">4d</button>
 		<button class="ext-btn circle transparent shasav">5d</button>
+		<button class="ext-btn circle transparent shasav btn-6d">6d</button>
+		<button class="ext-btn circle transparent shasav btn-7d">7d</button>
 		<label class="checkbox icon left-margin small-margin">
 			<input id="ext-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
@@ -130,9 +138,27 @@
 		<div class="field suffix small short tempo"><input id="config-tonic" type="number"><a class="disabled">Hz</a></div>
 	</nav>
 	<nav>
+		<span class="max" data-i18n="scoreline">譜線</span>
+		<label class="checkbox">
+			<input id="config-scoreline-1d" type="checkbox" checked><span>1d</span>
+		</label>
+		<label class="checkbox">
+			<input id="config-scoreline-2d" type="checkbox"><span>2d</span>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="higherdim">高次元</span>
+		<label class="checkbox">
+			<input id="config-enable-6d" type="checkbox"><span>6d</span>
+		</label>
+		<label class="checkbox">
+			<input id="config-enable-7d" type="checkbox"><span>7d</span>
+		</label>
+	</nav>
+	<nav>
 		<span class="max" data-i18n="time-quantize">時刻の量子化</span>
 		<label class="checkbox">
-			<input id="config-quantize-head" type="checkbox"><span data-i18n="head">先頭</span>
+			<input id="config-quantize-head" type="checkbox" checked><span data-i18n="head">先頭</span>
 		</label>
 		<label class="checkbox">
 			<input id="config-quantize-tail" type="checkbox"><span data-i18n="tail">末尾</span>
@@ -149,7 +175,7 @@
 	<nav>
 		<span class="max" data-i18n="pitch-quantize">音高の量子化</span>
 		<label class="checkbox">
-			<input id="config-quantize-base" type="checkbox" name="quantize"><span data-i18n="base-note">底音</span>
+			<input id="config-quantize-base" type="checkbox" name="quantize" checked><span data-i18n="base-note">底音</span>
 		</label>
 		<label class="checkbox">
 			<input id="config-quantize-sub" type="checkbox" name="quantize"><span data-i18n="other-note">その他</span>
@@ -171,7 +197,7 @@
 		</div>
 	</nav>
 	<nav>
-		<span id="tone-caption">Yamaha C5, Alexander Holm, CC BY 3.0</span>
+		<span id="tone-caption">　Yamaha C5, Alexander Holm, CC BY 3.0</span>
 	</nav>
 </article>
 <div id="snackbar" class="snackbar primary">
