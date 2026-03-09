@@ -6,7 +6,7 @@ export const gcd = (a, b) => {
 	return (b === 0) ? a : gcd(b, a % b)
 }
 export const pitchIntervals = {
-	// pitch: n/d, linestyle: {color, width}, position: {bottom - top}, curve: {middle}
+	// pitch: n/d, linestyle: {color, width}, position: {bottom, top}, curve: {middle}
 	'0d':  {id:  0, n:  1, d:  1, c: '#aaaaaa', w: 1, b: 0.5, t: 0.5, m:   0},
 	'1d':  {id:  1, n:  2, d:  1, c: '#aaaaaa', w: 3, b: 0.5, t: 0.5, m:   0},
 	'2d':  {id:  2, n:  3, d:  2, c: '#f27992', w: 7, b: 0  , t: 0  , m:   0},

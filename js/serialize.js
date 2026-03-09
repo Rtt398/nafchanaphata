@@ -14,6 +14,7 @@ export class Serializer {
 			i: $('#config-tone').value
 		} : false
 		const n = rootlayer.children.map(x => this.root2json(x))
+		console.log('serialized:', n)
 		const c = JSONCrush.crush(JSON.stringify(
 			{s: s, n: n}, 
 			(k, v) => (!v || v.length == 0) ? undefined : v
@@ -69,7 +70,7 @@ export class Serializer {
 	}
 
 	static json2sub(p, m) {
-		const q = p.addNote(m.l / 4, pitchIntervals[m.i + "d"], m.d / 4 || 0)
+		const q = p.addNote(m.l / 4, pitchIntervals[(m.i || 0) + "d"], m.d / 4 || 0)
 		q.mute = m.m || false
 		q.volume = 50 + (m.v || 0)
 		if (m.h) q.hz = m.h / 16
