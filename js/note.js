@@ -1,5 +1,5 @@
 
-import { hz2y, y2hz, x2t, f2d, qb, qs, qh, qt, tav, pitchIntervals, $, $$, OFFSET } from './util.js';
+import { hz2y, y2hz, x2t, f2d, qb, qs, qh, qt, tav, pitchIntervals, $, $$, clamp, OFFSET } from './util.js';
 import { playNotes, sampler } from './sound.js';
 import history from './history.js'
 
@@ -31,7 +31,8 @@ export class Note extends Konva.Group {
 			$(`#${this.type}mute`).checked = this.isMuted
 			$(`#overlay`).style.visibility = "visible"
 			$(`#${this.type}menu`).style.top = this.pitchline.absolutePosition().y + "px"
-			$(`#${this.type}menu`).style.left = e.evt.clientX - $(`#${this.type}menu`).clientWidth / 2 + "px"
+			console.log('clamp:', 0, e.evt.clientX - $(`#${this.type}menu`).clientWidth / 2, window.innerWidth - $(`#${this.type}menu`).clientWidth) + "px"
+			$(`#${this.type}menu`).style.left = clamp(0, e.evt.clientX - $(`#${this.type}menu`).clientWidth / 2, window.innerWidth - $(`#${this.type}menu`).clientWidth) + "px"
 			ui()
 			this.playThis()
 		})

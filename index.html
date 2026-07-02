@@ -11,20 +11,20 @@
 <body class="dark">
 <div id="sequencer"></div>
 <header class="absolute bottom responsive max small-blur"><nav class="tiny-space primary-text">
-	<label class="checkbox icon top-padding bottom-padding small-padding">
-		Shift<input type="checkbox" id="shift-mode-btn"><span><i>close</i><i>check</i></span>
+	<label class="checkbox icon small-padding">
+		<input type="checkbox" id="shift-mode-btn"><span><i>link_off</i><i>link</i></span>
 	</label>
 	<button id="undo-btn" class="circle transparent"><i class="large fill">undo</i></button>
 	<div class="max"></div>
 	<button id="stop-btn" class="circle transparent"><i class="large fill">stop</i></button>
-	<button id="play-btn" class="circle transparent small-padding"><i class="huge fill">play_arrow</i></button>
+	<button id="play-btn" class="circle transparent"><i class="huge fill">play_arrow</i></button>
 	<label class="checkbox icon small-padding"><input id="repeat-btn" type="checkbox"><span><i>repeat</i><i>repeat_on</i></span></label>
 	<div class="max"></div>
 	<button id="config-btn" class="circle transparent"><i class="fill">settings</i></button>
 	<button id="share-btn" class="circle transparent"><i class="fill">share</i></button>
 </nav></header>
 <div id="overlay" class="overlay"></div>
-<article id="rootmenu" class="pop-up border small-blur absolute margin">
+<article id="rootmenu" class="pop-up border small-blur absolute">
 	<nav>
 		<button class="play-this-btn circle transparent primary-text"><i class="large fill">play_arrow</i></button>
 		<span id="roothz" class="hz" contenteditable="plaintext-only" onKeyPress="if(event.key == 'Enter') {event.preventDefault(); event.target.blur()}">440</span>
@@ -42,7 +42,7 @@
 		</label>
 	</nav>
 	<nav class="no-margin no-space">
-		<span class="max" data-i18n="prog">［進行］</span>
+		<span class="nowrap" data-i18n="prog">［進行］</span>
 		<button class="prog-btn circle transparent shasav">0d</button>
 		<button class="prog-btn circle transparent shasav">1d</button>
 		<button class="prog-btn circle transparent shasav">2d</button>
@@ -56,7 +56,7 @@
 		</label>
 	</nav>
 	<nav class="no-space no-margin">
-		<span class="max" data-i18n="ext">［拡張］</span>
+		<span class="nowrap" data-i18n="ext">［拡張］</span>
 		<button class="root-ext-btn circle transparent shasav">0d</button>
 		<button class="root-ext-btn circle transparent shasav">1d</button>
 		<button class="root-ext-btn circle transparent shasav">2d</button>
@@ -70,7 +70,7 @@
 		</label>
 	</nav>
 </article>
-<article id="menu" class="pop-up border small-blur absolute margin">
+<article id="menu" class="pop-up border small-blur absolute">
 	<nav>
 		<button class="play-this-btn circle transparent primary-text"><i class="large fill">play_arrow</i></button>
 		<span id="hz" class="hz"></span>
@@ -88,7 +88,7 @@
 		</label>
 	</nav>
 	<nav class="no-margin no-space">
-		<span class="max" data-i18n="trans">［転写］</span>
+		<span class="nowrap" data-i18n="trans">［転写］</span>
 		<button class="trans-btn circle transparent shasav">0d</button>
 		<button class="trans-btn circle transparent shasav">1d</button>
 		<button class="trans-btn circle transparent shasav">2d</button>
@@ -102,7 +102,7 @@
 		</label>
 	</nav>
 	<nav class="no-space no-margin">
-		<span class="max" data-i18n="ext">［拡張］</span>
+		<span class="nowrap" data-i18n="ext">［拡張］</span>
 		<button class="ext-btn circle transparent shasav">0d</button>
 		<button class="ext-btn circle transparent shasav">1d</button>
 		<button class="ext-btn circle transparent shasav">2d</button>
@@ -185,8 +185,8 @@
 		<span class="max" data-i18n="resolution">　分解能</span>
 		<div class="field suffix small short tick"><input id="config-edo" type="number"><a class="disabled">edo</a></div>
 	</nav>
-	<nav class="large-space">
-		<span class="max" data-i18n="tone">音色</span>
+	<nav>
+		<span class="nowrap" data-i18n="tone">音色</span>
 		<div class="field suffix border round small">
 			<select id="config-tone">
 				<option selected value="salamander-piano" data-caption="Yamaha C5, Alexander Holm, CC BY 3.0">Salamander Grand Piano</option>

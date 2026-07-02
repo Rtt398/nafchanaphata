@@ -1,6 +1,7 @@
 export const $ = q => document.querySelector(q)
 export const $$ = q => document.querySelectorAll(q)
 export const range = n => Array(n).keys()
+export const clamp = (min, num, max) => Math.min(Math.max(num, min), max)
 
 export const gcd = (a, b) => {
 	return (b === 0) ? a : gcd(b, a % b)

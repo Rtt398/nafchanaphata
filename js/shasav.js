@@ -7,7 +7,7 @@ import { stage, grid, rootlayer } from './sequencer.js';
 import { i18n } from './i18n.js';
 import { bindKeys } from './keybinds.js';
 
-bindKeys();
+bindKeys()
 
 if (location.hostname == 'localhost') {
 	import('./test.js')
@@ -34,7 +34,7 @@ $('#overlay').addEventListener('pointerdown', function(e) {
 })
 
 $('#config-btn').addEventListener('click', e => {
-	$(`#overlay`).style.visibility = "visible"
+	$('#overlay').style.visibility = "visible"
 	$('#config').style.top = '1.5rem'
 	$('#tone-caption').innerText
 })
@@ -82,6 +82,7 @@ $('#undo-btn').addEventListener('click', e => {
 })
 
 $('#play-btn').addEventListener('click', e => {
+	Tone.Transport.cancel()
 	rootlayer.children.map(n => n.buildPart())
 	Tone.Transport.seconds = Tone.Transport.loopStart
 	Tone.Transport.start()

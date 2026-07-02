@@ -24,6 +24,7 @@
 }
 
 body {
+	position: fixed;
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
@@ -44,6 +45,10 @@ i {
 	border-radius: 0 !important;
 }
 
+:is(.checkbox,.radio)>span:not(:empty) {
+    padding-inline-start: 0;
+}
+
 :is(nav,.row).tiny-space {
 	gap: 1%;
 	justify-content: center;
@@ -55,7 +60,7 @@ canvas {
 
 #sequencer {
 	width: 100vw;
-	height: 100dvh;
+	height: 100lvh;
 	background-color: #676681;
 }
 
@@ -92,7 +97,7 @@ canvas {
 }
 
 i.huge {
-	--_size: 2.75rem;
+	--_size: 3rem;
 }
 .short {
 	width: 8rem;
@@ -104,4 +109,7 @@ i.huge {
 }
 a.disabled {
 	pointer-events: none;
+}
+span.nowrap {
+	text-wrap-mode: nowrap;
 }

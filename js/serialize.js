@@ -14,7 +14,7 @@ export class Serializer {
 			i: $('#config-tone').value
 		} : false
 		const n = rootlayer.children.map(x => this.root2json(x))
-		console.log('serialized:', n)
+//		console.log('serialized:', n)
 		const c = JSONCrush.crush(JSON.stringify(
 			{s: s, n: n}, 
 			(k, v) => (!v || v.length == 0) ? undefined : v
