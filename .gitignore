@@ -1,5 +1,6 @@
 node_modules/
 local_images/
+desktop.ini
 *.test.js
 vitest.*.js
 package*.json
