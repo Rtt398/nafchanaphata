@@ -50,7 +50,7 @@ i {
 }
 
 :is(nav,.row).tiny-space {
-	gap: 1%;
+	gap: 2%;
 	justify-content: space-between;
 }
 
