@@ -31,7 +31,6 @@ export class Note extends Konva.Group {
 			$(`#${this.type}mute`).checked = this.isMuted
 			$(`#overlay`).style.visibility = "visible"
 			$(`#${this.type}menu`).style.top = this.pitchline.absolutePosition().y + "px"
-			console.log('clamp:', 0, e.evt.clientX - $(`#${this.type}menu`).clientWidth / 2, window.innerWidth - $(`#${this.type}menu`).clientWidth) + "px"
 			$(`#${this.type}menu`).style.left = clamp(0, e.evt.clientX - $(`#${this.type}menu`).clientWidth / 2, window.innerWidth - $(`#${this.type}menu`).clientWidth) + "px"
 			ui()
 			this.playThis()

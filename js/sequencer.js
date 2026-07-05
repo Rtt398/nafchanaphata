@@ -1,6 +1,7 @@
 
 import {makePincher} from './pincher.js'
 import {Grid} from './grid.js'
+import {Serializer} from './serialize.js'
 import {RootNote} from './note.js'
 import history from './history.js'
 
@@ -22,9 +23,16 @@ stage.on('pointerclick', e => {
 	if (stage.isDragging() || stage.isPinching || e.evt.button != 0 || stage.isNoteDragging) return
 	history.snapshot()
 	const pos = stage.getRelativePointerPosition()
-	const root = new RootNote(stage, pos.x, pos.y, 48)
-	rootlayer.add(root)
-	root.playThis()
+	if (stage.cb) {
+		stage.cb.x = pos.x * 4
+		const root = Serializer.json2root(stage.cb)
+		root.playThis()
+		stage.cb = null
+	} else {
+		const root = new RootNote(stage, pos.x, pos.y, 48)
+		rootlayer.add(root)
+		root.playThis()
+	}
 	rootlayer.draw()
 })
 

@@ -105,6 +105,14 @@ $('#share-btn').addEventListener('click', async e => {
 	ui('#snackbar', 3000)
 })
 
+$('#rootcopy').addEventListener('click', e => {
+	if (stage.current) {
+		stage.cb = Serializer.root2json(stage.current)
+		console.log(stage.cb)
+	}
+	$('#overlay').style.visibility = ''
+	$('#rootmenu').style.top = ''
+})
 
 $('#rootdelete').addEventListener('click', e => {
 	if (stage.current) {

@@ -33,6 +33,24 @@ function tones(tone) {
 				},
 				release: 1.25
 			})
+		case 'vcsl-ksharp':
+			return new Tone.Sampler({
+				baseUrl: 'sound/ksharp/',
+				urls: {
+					'A4':'A4.ogg','B1':'B1.ogg','B5':'B5.ogg','B6':'B6.ogg','C3':'C3.ogg','D4':'D4.ogg',
+					'E5':'E5.ogg','F2':'F2.ogg','F6':'F6.ogg','G3':'G3.ogg'
+				},
+				release: 1.25
+			})
+		case 'vcsl-pipeorgan-rode':
+			return new Tone.Sampler({
+				baseUrl: 'sound/pipeorgan/',
+				urls: {
+					'C1':'C1.ogg','C2':'C2.ogg','C3':'C3.ogg','C4':'C4.ogg','C5':'C5.ogg','C6':'C6.ogg',
+					'F#1': 'Fs1.ogg','F#2': 'Fs2.ogg','F#3': 'Fs3.ogg','F#4': 'Fs4.ogg','F#5': 'Fs5.ogg'
+				},
+				release: 1.25
+			})
 	}
 }
 

@@ -59,16 +59,21 @@ export class Serializer {
 		}
 		if (!u.n) return
 		for (const n of u.n) {
-			const p = new RootNote(stage, n.x / 4 || 0, hz2y(n.h / 16), n.l / 4)
-			p.mute = n.m || false
-			p.volume = 50 + (n.v || 0)
-			rootlayer.add(p)
-			for (const m of n.s || []) {
-				this.json2sub(p, m)
-			}
+			this.json2root(n)
 		}
 	}
-
+	
+	static json2root(n) {
+		const p = new RootNote(stage, n.x / 4 || 0, hz2y(n.h / 16), n.l / 4)
+		p.mute = n.m || false
+		p.volume = 50 + (n.v || 0)
+		rootlayer.add(p)
+		for (const m of n.s || []) {
+			this.json2sub(p, m)
+		}
+		return p
+	}
+	
 	static json2sub(p, m) {
 		const q = p.addNote(m.l / 4, pitchIntervals[(m.i || 0) + "d"], m.d / 4 || 0)
 		q.mute = m.m || false
