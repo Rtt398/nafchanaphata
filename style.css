@@ -64,6 +64,10 @@ canvas {
 	background-color: #676681;
 }
 
+header {
+	padding-block-end: calc(100lvh - 100dvh);
+}
+
 #config {
 	width: fit-content;
 	left: 0;
