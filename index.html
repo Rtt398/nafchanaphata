@@ -7,32 +7,108 @@
 <link href="https://cdn.jsdelivr.net/npm/beercss@3.10.5/dist/cdn/beer.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
 <link rel="stylesheet" href="./style.css">
-<link rel="icon" href="./favicon.ico">
-
+<link rel="icon" href="./favicon.ico?v=3">
 </head>
 <body class="dark">
+<script>
+// === 终极键盘拦截：同步内联脚本，先于所有外部库执行 ===
+(function() {
+	// 空格 = 播放/暂停
+	window.addEventListener('keydown', function(e) {
+		if (e.code !== 'Space') return
+		var el = document.activeElement
+		if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return
+		e.preventDefault()
+		e.stopImmediatePropagation()
+		var btn = document.getElementById('play-pause-btn')
+		if (btn) btn.click()
+	}, true)
+
+	// H = 帮助面板
+	window.addEventListener('keydown', function(e) {
+		if (e.code !== 'KeyH' || e.ctrlKey || e.altKey || e.metaKey) return
+		var el = document.activeElement
+		if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return
+		e.preventDefault()
+		var help = document.getElementById('help')
+		var ov = document.getElementById('overlay')
+		if (help && ov) {
+			ov.style.visibility = 'visible'
+			help.style.top = '1.5rem'
+			help.style.visibility = 'visible'
+		}
+	}, true)
+
+	// Tab：不让 header 按钮/复选框获取焦点
+	document.addEventListener('keydown', function(e) {
+		if (e.code !== 'Tab') return
+		e.preventDefault()
+		e.stopImmediatePropagation()
+	}, true)
+
+	// Shift 松开后 1s 内禁止点击创建音符
+	var _shiftUpAt = 0
+	window._shiftUpAt = 0
+	window._shiftDown = false
+	window.addEventListener('keydown', function(e) {
+		if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+			window._shiftDown = true
+		}
+	}, true)
+	window.addEventListener('keyup', function(e) {
+		if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') {
+			window._shiftDown = false
+			_shiftUpAt = window._shiftUpAt = Date.now()
+		}
+	}, true)
+
+	// Ctrl+C/V/X/D/A — 复制/粘贴/剪切/删除/全选
+	window.addEventListener('keydown', function(e) {
+		if (!e.ctrlKey || e.metaKey) return
+		var el = document.activeElement
+		if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return
+		var s = window._sel
+		if (!s) return
+		if (e.code === 'KeyC') { e.preventDefault(); e.stopImmediatePropagation(); s.copy() }
+		if (e.code === 'KeyV') { e.preventDefault(); e.stopImmediatePropagation(); s.pasteAt(s._lastClickX || 200, s._lastClickY || 200) }
+		if (e.code === 'KeyX') { e.preventDefault(); e.stopImmediatePropagation(); s.cut() }
+		if (e.code === 'KeyD') { e.preventDefault(); e.stopImmediatePropagation(); s.deleteSelected() }
+		if (e.code === 'KeyA') { e.preventDefault(); e.stopImmediatePropagation(); s.selectAll() }
+	}, true)
+
+	// 点击 header 按钮时不获取焦点
+	document.addEventListener('mousedown', function(e) {
+		var btn = e.target.closest('header button')
+		if (btn) {
+			e.preventDefault()
+			btn.tabIndex = -1
+		}
+	}, true)
+})();
+</script>
 <div id="sequencer"></div>
 <header class="absolute bottom responsive max small-blur"><nav class="tiny-space primary-text">
-	<label class="checkbox icon small-padding">
-		<input type="checkbox" id="shift-mode-btn"><span><i>link_off</i><i>link</i></span>
+	<label class="checkbox icon top-padding bottom-padding small-padding">
+		Shift<input type="checkbox" id="shift-mode-btn"><span><i>close</i><i>check</i></span>
 	</label>
 	<button id="undo-btn" class="circle transparent"><i class="large fill">undo</i></button>
+	<button id="clear-btn" class="circle transparent" data-i18n-title="clear" title="清屏"><i class="large fill">delete</i></button>
 	<div class="max"></div>
-	<button id="stop-btn" class="circle transparent"><i class="large fill">stop</i></button>
-	<button id="play-btn" class="circle transparent"><i class="huge fill">play_arrow</i></button>
+	<button id="skip-btn" class="circle transparent" data-i18n-title="skip" title="回开头"><i class="large fill">skip_previous</i></button>
+	<button id="play-pause-btn" class="circle transparent small-padding"><i class="huge fill">play_arrow</i></button>
 	<label class="checkbox icon small-padding"><input id="repeat-btn" type="checkbox"><span><i>repeat</i><i>repeat_on</i></span></label>
 	<div class="max"></div>
 	<button id="config-btn" class="circle transparent"><i class="fill">settings</i></button>
 	<button id="share-btn" class="circle transparent"><i class="fill">share</i></button>
 </nav></header>
 <div id="overlay" class="overlay"></div>
-<article id="rootmenu" class="pop-up border small-blur absolute">
+<article id="rootmenu" class="pop-up border small-blur absolute margin">
 	<nav>
 		<button class="play-this-btn circle transparent primary-text"><i class="large fill">play_arrow</i></button>
 		<span id="roothz" class="hz" contenteditable="plaintext-only" onKeyPress="if(event.key == 'Enter') {event.preventDefault(); event.target.blur()}">440</span>
 		<span id="roottav" class="max shasav"></span>
-		<button id="rootcopy" class="circle transparent primary-text"><i>content_copy</i></button>
 		<button id="rootdelete" class="circle transparent primary-text"><i>delete</i></button>
+		<button id="roothide" class="circle transparent primary-text"><i>visibility</i></button>
 	</nav>
 	<nav class="small-margin">
 		<label class="checkbox icon">
@@ -44,8 +120,29 @@
 			<div class="tooltip small-padding"></div>
 		</label>
 	</nav>
+	<nav class="small-margin">
+		<span class="max" data-i18n="note-thickness">粗细</span>
+		<label class="slider">
+			<input id="root-note-thick" type="range" value="3" min="1" max="12" step="0.5">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav class="small-margin">
+		<span class="max" data-i18n="link-thickness">连线粗细</span>
+		<label class="slider">
+			<input id="root-link-thick" type="range" value="1" min="0.1" max="4" step="0.1">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav class="small-margin">
+		<span class="max" data-i18n="link-opacity">连线透明</span>
+		<label class="slider">
+			<input id="root-link-opacity" type="range" value="100" min="10" max="100">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
 	<nav class="no-margin no-space">
-		<span class="nowrap" data-i18n="prog">［進行］</span>
+		<span class="max" data-i18n="prog">［進行］</span>
 		<button class="prog-btn circle transparent shasav">0d</button>
 		<button class="prog-btn circle transparent shasav">1d</button>
 		<button class="prog-btn circle transparent shasav">2d</button>
@@ -59,7 +156,7 @@
 		</label>
 	</nav>
 	<nav class="no-space no-margin">
-		<span class="nowrap" data-i18n="ext">［拡張］</span>
+		<span class="max" data-i18n="ext">［拡張］</span>
 		<button class="root-ext-btn circle transparent shasav">0d</button>
 		<button class="root-ext-btn circle transparent shasav">1d</button>
 		<button class="root-ext-btn circle transparent shasav">2d</button>
@@ -72,13 +169,20 @@
 			<input id="root-ext-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
 	</nav>
+	<nav class="no-space tiny-margin">
+		<span class="max" data-i18n="ext-shortcut">扩展快捷键</span>
+	</nav>
+	<nav id="root-ext-shortcuts-up" class="no-space tiny-margin" style="font-size:10px;color:#aaa;"></nav>
+	<nav id="root-ext-shortcuts-down" class="no-space tiny-margin" style="font-size:10px;color:#aaa;"></nav>
 </article>
-<article id="menu" class="pop-up border small-blur absolute">
+<article id="menu" class="pop-up border small-blur absolute margin">
 	<nav>
 		<button class="play-this-btn circle transparent primary-text"><i class="large fill">play_arrow</i></button>
 		<span id="hz" class="hz"></span>
 		<span id="tav" class="max shasav"></span>
+		<button id="promote" class="circle transparent primary-text" data-i18n-title="promote" title="提升为根音"><i>arrow_upward</i></button>
 		<button id="delete" class="circle transparent primary-text"><i>delete</i></button>
+		<button id="hide" class="circle transparent primary-text"><i>visibility</i></button>
 	</nav>
 	<nav class="small-margin">
 		<label class="checkbox icon">
@@ -90,8 +194,29 @@
 			<div class="tooltip small-padding"></div>
 		</label>
 	</nav>
+	<nav class="small-margin">
+		<span class="max" data-i18n="note-thickness">粗细</span>
+		<label class="slider">
+			<input id="note-thick" type="range" value="3" min="1" max="12" step="0.5">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav class="small-margin">
+		<span class="max" data-i18n="link-thickness">连线粗细</span>
+		<label class="slider">
+			<input id="link-thick" type="range" value="1" min="0.1" max="4" step="0.1">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav class="small-margin">
+		<span class="max" data-i18n="link-opacity">连线透明</span>
+		<label class="slider">
+			<input id="link-opacity" type="range" value="100" min="10" max="100">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
 	<nav class="no-margin no-space">
-		<span class="nowrap" data-i18n="trans">［転写］</span>
+		<span class="max" data-i18n="trans">［転写］</span>
 		<button class="trans-btn circle transparent shasav">0d</button>
 		<button class="trans-btn circle transparent shasav">1d</button>
 		<button class="trans-btn circle transparent shasav">2d</button>
@@ -105,7 +230,7 @@
 		</label>
 	</nav>
 	<nav class="no-space no-margin">
-		<span class="nowrap" data-i18n="ext">［拡張］</span>
+		<span class="max" data-i18n="ext">［拡張］</span>
 		<button class="ext-btn circle transparent shasav">0d</button>
 		<button class="ext-btn circle transparent shasav">1d</button>
 		<button class="ext-btn circle transparent shasav">2d</button>
@@ -118,6 +243,11 @@
 			<input id="ext-dir" type="checkbox"><span><i>north</i><i>south</i></span>
 		</label>
 	</nav>
+	<nav class="no-space tiny-margin">
+		<span class="max" data-i18n="ext-shortcut">扩展快捷键</span>
+	</nav>
+	<nav id="ext-shortcuts-up" class="no-space tiny-margin" style="font-size:10px;color:#aaa;"></nav>
+	<nav id="ext-shortcuts-down" class="no-space tiny-margin" style="font-size:10px;color:#aaa;"></nav>
 </article>
 <article id="config" class="pop-up blur absolute large-padding">
 	<h4 data-i18n="config">設定</h4>
@@ -127,18 +257,25 @@
 			<select id="config-lang">
 				<option selected value="ja">日本語</option>
 				<option value="en">English</option>
+				<option value="zh">中文</option>
 				<option value="sf">Safcyk</option>
 			</select>
 			<i>arrow_drop_down</i>
 		</div>
 	</nav>
 	<nav>
+		<span class="max" data-i18n="pianoroll">卷帘式播放</span>
+		<label class="checkbox">
+			<input id="config-pianoroll" type="checkbox" checked><span></span>
+		</label>
+	</nav>
+	<nav>
 		<span class="max" data-i18n="beat-length">1拍の長さ</span>
-		<div class="field suffix small short tempo"><input id="config-beat" type="number"><a class="disabled">ms</a></div>
+		<div class="field suffix small short tempo"><input id="config-beat" type="number" value="500"><a class="disabled">ms</a></div>
 	</nav>
 	<nav>
 		<span class="max" data-i18n="tonic">基準音高</span>
-		<div class="field suffix small short tempo"><input id="config-tonic" type="number"><a class="disabled">Hz</a></div>
+		<div class="field suffix small short tempo"><input id="config-tonic" type="number" value="440"><a class="disabled">Hz</a></div>
 	</nav>
 	<nav>
 		<span class="max" data-i18n="scoreline">譜線</span>
@@ -147,6 +284,12 @@
 		</label>
 		<label class="checkbox">
 			<input id="config-scoreline-2d" type="checkbox"><span>2d</span>
+		</label>
+		<label class="checkbox">
+			<input id="config-scoreline-3d" type="checkbox"><span>3d</span>
+		</label>
+		<label class="checkbox">
+			<input id="config-scoreline-4d" type="checkbox"><span>4d</span>
 		</label>
 	</nav>
 	<nav>
@@ -159,6 +302,11 @@
 		</label>
 	</nav>
 	<nav>
+		<span class="max" data-i18n="custom-dim">自定义维度</span>
+		<label class="btn" id="custom-dim-btn"><i class="material-icons" data-i18n="">build</i></label>
+	</nav>
+	<nav id="custom-dim-checks" style="display:none"></nav>
+	<nav>
 		<span class="max" data-i18n="time-quantize">時刻の量子化</span>
 		<label class="checkbox">
 			<input id="config-quantize-head" type="checkbox" checked><span data-i18n="head">先頭</span>
@@ -170,6 +318,18 @@
 	<nav>
 		<span class="max" data-i18n="resolution">　分解能</span>
 		<div class="field prefix suffix small short tick"><a class="disabled">1/</a><input id="config-tick" type="number"><a class="disabled" data-i18n="beat">拍</a></div>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="subdivide-lines">分割谱线</span>
+		<label class="checkbox">
+			<input id="config-subdivide-lines" type="checkbox"><span></span>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="fixed-note-len">时值相同</span>
+		<label class="checkbox">
+			<input id="config-fixed-note-len" type="checkbox"><span></span>
+		</label>
 	</nav>
 	<nav>
 		<span class="max" data-i18n="time-randomize">時刻のランダム化</span>
@@ -188,15 +348,15 @@
 		<span class="max" data-i18n="resolution">　分解能</span>
 		<div class="field suffix small short tick"><input id="config-edo" type="number"><a class="disabled">edo</a></div>
 	</nav>
-	<nav>
-		<span class="nowrap" data-i18n="tone">音色</span>
+	<nav class="large-space">
+		<span class="max" data-i18n="tone">音色</span>
 		<div class="field suffix border round small">
 			<select id="config-tone">
 				<option selected value="salamander-piano" data-caption="Yamaha C5, Alexander Holm, CC BY 3.0">Salamander Grand Piano</option>
 				<option value="vcsl-strumstick" data-caption="Versilian Studios LLC, CC0">VCSL Strumstick</option>
 				<option value="vcsl-vibraphone" data-caption="Versilian Studios LLC, CC0">VCSL Vibraphone</option>
 				<option value="vcsl-ksharp" data-caption="Versilian Studios LLC, CC0">VCSL Concert Harp</option>
-				<option value="vcsl-pipeorgan-rode" data-caption="Simon Dalzell, Versilian Studios LLC, CC0">VCSL Pipe Orgam</option>
+				<option value="vcsl-pipeorgan-rode" data-caption="Simon Dalzell, Versilian Studios LLC, CC0">VCSL Pipe Organ</option>
 			</select>
 			<i>arrow_drop_down</i>
 		</div>
@@ -204,10 +364,203 @@
 	<nav>
 		<span id="tone-caption">　Yamaha C5, Alexander Holm, CC BY 3.0</span>
 	</nav>
+	<nav>
+		<span class="max" data-i18n="notecolor">音符颜色</span>
+		<label class="checkbox">
+			<input id="config-color-wavelength" type="checkbox" name="notecolor" checked><span data-i18n="wavelength">波长</span>
+		</label>
+		<label class="checkbox">
+			<input id="config-color-hsl" type="checkbox" name="notecolor"><span data-i18n="hsl">HSI增强</span>
+		</label>
+		<label class="checkbox">
+			<input id="config-color-white" type="checkbox" name="notecolor"><span data-i18n="color-white">白色</span>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="note-thickness">音符粗细</span>
+		<label class="slider">
+			<input id="config-note-thickness" type="range" value="3" min="1" max="12" step="0.5">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="link-thickness">连线粗细</span>
+		<label class="slider">
+			<input id="config-link-thickness" type="range" value="1" min="0.1" max="4" step="0.1">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="link-opacity">连线透明</span>
+		<label class="slider">
+			<input id="config-link-opacity" type="range" value="100" min="10" max="100">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="root-mark">根音箭头</span>
+		<label class="checkbox">
+			<input id="config-root-mark" type="checkbox" checked><span></span>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="export">导出</span>
+		<div class="field suffix border round small">
+			<select id="export-format">
+				<option selected value="midi-microtonal">MIDI（微分音）</option>
+				<option value="midi-12tet">MIDI（12平均律）</option>
+				<option value="midi-custom-edo">MIDI（自定义律制）</option>
+				<option value="wav">WAV</option>
+			</select>
+			<i>arrow_drop_down</i>
+		</div>
+		<input id="export-edo" type="number" min="2" max="1200" value="31" placeholder="EDO"
+			style="display:none;width:50px;background:#3a3a56;color:#fff;border:1px solid #555;border-radius:4px;padding:4px;text-align:center;margin-left:4px;">
+		<button id="export-btn" class="circle transparent"><i>download</i></button>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="import">导入</span>
+		<div class="field suffix border round small">
+			<select id="import-format">
+				<option selected value="midi">MIDI（12平均律）</option>
+				<option value="midi-microtonal">MIDI（微分音EDO）</option>
+			</select>
+			<i>arrow_drop_down</i>
+		</div>
+		<button id="import-btn" class="circle transparent"><i>upload</i></button>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="project">工程</span>
+		<button id="save-project-btn" class="round small" data-i18n="save">保存</button>
+		<button id="load-project-btn" class="round small" data-i18n="load">加载</button>
+	</nav>
+	<hr>
+	<nav>
+		<button id="help-btn" class="round small" data-i18n="help">快捷键帮助</button>
+	</nav>
+</article>
+<article id="help" class="pop-up blur absolute large-padding" style="top:1.5rem;visibility:hidden">
+	<h4 data-i18n="shortcuts">快捷键与帮助</h4>
+	<nav><span class="max" data-i18n-html="help-content">
+<h4>播放</h4>
+<p><kbd>Space</kbd> — 播放 / 暂停</p>
+<p><kbd>Skip</kbd> 按钮 — 跳回开头</p>
+<p>底部循环开关 — 循环播放</p>
+<h4>音符操作</h4>
+<p>点击网格空白 — 创建根音符</p>
+<p>点击音符 — 打开编辑弹窗</p>
+<p>拖拽音符左端 — 改变起始位置</p>
+<p>拖拽音符右端 — 改变长度</p>
+<p>拖拽音符中部 — 改变音高</p>
+<p>弹窗 <i>delete</i> 按钮 — 删除音符</p>
+<p>弹窗 <i>visibility</i> 按钮 — 隐藏/显示音符（Ctrl+点击仍可选中）</p>
+<p>Extend — 向当前音符添加泛音子音符</p>
+<p>Trans — 将当前音符转写到另一维度</p>
+<p>Prog — 累进移动根音音高</p>
+<p>弹窗 Hz 栏可直接编辑频率</p>
+<p>弹窗内可调音量、静音、粗细、透明度</p>
+<h4>扩展快捷键</h4>
+<p>弹窗底部显示各维度的快捷按键</p>
+<p>点击快捷键标签可自定义键位（支持双键组合如 A+B）</p>
+<p>未设置快捷键的维度显示"自定义"，点击即可设置</p>
+<h4>框选与批量操作</h4>
+<p><kbd>Shift</kbd> + 拖拽空白 — 矩形框选</p>
+<p>拖拽任一选中音符 — 整体移动组</p>
+<p>点击空白 — 取消选区</p>
+<p><kbd>Ctrl</kbd> + <kbd>C</kbd> — 复制选中</p>
+<p><kbd>Ctrl</kbd> + <kbd>V</kbd> — 粘贴（原位过近自动偏移）</p>
+<p><kbd>Ctrl</kbd> + <kbd>X</kbd> — 剪切</p>
+<p><kbd>Ctrl</kbd> + <kbd>A</kbd> — 全选</p>
+<p><kbd>Ctrl</kbd> + <kbd>D</kbd> — 删除选中</p>
+<h4>自定义维度（Config）</h4>
+<p>Config → 自定义维度 → 扳手图标 — 打开管理弹窗</p>
+<p>输入分子/分母（如 7/6），预览连线颜色和竖线位置</p>
+<p>添加后在扩展/进行/转写菜单中出现对应按钮</p>
+<p>支持任意有理数比率（n > d > 0）</p>
+<p>自定义维度可通过勾选框独立启用/禁用</p>
+<h4>Config 面板</h4>
+<p>拍长（ms）/ 音高 / 分辨率 / 谱线维度 / 高维度</p>
+<p>分割谱线 — 按分辨率细分拍内谱线</p>
+<p>时值相同 — 点击创建音符时值自动匹配分辨率</p>
+<p>卷帘式播放 — MIDI 风格滚屏</p>
+<p>音符颜色 — 波长 / HSI增强 / 白色</p>
+<p>粗细 / 连线粗细 / 连线透明度 — 全局或单音调节</p>
+<h4>视图缩放</h4>
+<p><kbd>Ctrl</kbd> + 滚轮 — 等比缩放</p>
+<p><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + 滚轮 — 纵向拉伸</p>
+<p><kbd>Ctrl</kbd> + <kbd>Alt</kbd> + 滚轮 — 横向拉伸</p>
+<h4>时值分辨率</h4>
+<p><kbd>Tab</kbd> + 数字 — 切换分辨率（如 Tab+4 → 1/4，Tab+12 → 1/12）</p>
+<p>支持两位数（Tab 后连续输入，800ms 超时自动提交）</p>
+<p>按 0 忽略，再次按 Tab 立即提交</p>
+<h4>编辑辅助</h4>
+<p><kbd>Ctrl</kbd> + <kbd>Z</kbd> — 撤销</p>
+<p><kbd>H</kbd> — 打开此帮助</p>
+<p>左下角 Shift 开关 — 连带编辑模式</p>
+<p>左下角垃圾桶 — 一键清屏</p>
+<h4>导出</h4>
+<p>MIDI（微分音） — 全微分音 MIDI 导出（含 pitch bend）</p>
+<p>MIDI（12平均律） — 量化到 12-TET</p>
+<p>MIDI（自定义律制） — 输入 EDO 值，导出为对应律制</p>
+<p>WAV — 音频渲染导出</p>
+<h4>导入</h4>
+<p>MIDI（12平均律） — 含 pitch bend 还原</p>
+<p>MIDI（微分音EDO） — 按指定 EDO 映射，自动检测轨道名</p>
+<p>工程文件 — 加载 .naf 文件</p>
+<h4>工程管理</h4>
+<p>保存 / 加载 .naf 工程文件</p>
+<p>URL 分享 — 序列化所有音符和设置</p>
+<p>保存时可选路径和文件名</p>
+	</span></nav>
 </article>
 <div id="snackbar" class="snackbar primary">
 	<div id="snackbar-text" class="max" data-i18n="copy-finish">コピー完了</div>
 	<a class="inverse-link"><i>close</i></a>
+</div>
+
+<!-- 自定义维度弹窗 -->
+<div class="modal" id="custom-dim-modal">
+	<div class="modal-content" style="max-width:420px; background:#2a2a3e; color:#ddd; border-radius:8px; padding:16px;">
+		<h5 data-i18n="custom-dim-title" style="margin-top:0">自定义维度管理</h5>
+		<div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">
+			<span style="white-space:nowrap" data-i18n="ratio">比例</span>
+			<input id="custom-dim-n" type="number" min="2" value="5" style="width:60px; background:#3a3a56; color:#fff; border:1px solid #555; border-radius:4px; padding:4px; text-align:center;">
+			<span>/</span>
+			<input id="custom-dim-d" type="number" min="1" value="3" style="width:60px; background:#3a3a56; color:#fff; border:1px solid #555; border-radius:4px; padding:4px; text-align:center;">
+			<span id="custom-dim-preview-ratio" style="font-size:12px; color:#aaa; margin-left:4px;">≈ 1.667</span>
+		</div>
+		<p style="font-size:11px; color:#888; margin:0 0 8px 0" data-i18n="ratio-hint">比例必须大于1（n > d）</p>
+		<div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+			<span data-i18n="line-color" style="font-size:12px;">连线颜色</span>
+			<div id="custom-dim-color-preview" style="width:36px; height:18px; border-radius:3px; border:1px solid #666;"></div>
+			<span id="custom-dim-wavelength" style="font-size:11px; color:#aaa;"></span>
+		</div>
+		<div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+			<span data-i18n="mark-pos" style="font-size:12px;">竖线位置</span>
+			<span id="custom-dim-pos-preview" style="font-size:13px; color:#ffc247;"></span>
+		</div>
+		<div style="display:flex; gap:8px; margin-bottom:16px;">
+			<button id="custom-dim-save-btn" class="small-round" style="background:#4CAF50; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;" data-i18n="add-dim">+ 添加</button>
+		</div>
+		<div id="custom-dim-list" style="max-height:200px; overflow-y:auto;">
+			<p style="font-size:11px; color:#888;" data-i18n="no-custom-dim">暂无自定义维度</p>
+		</div>
+		<div style="margin-top:12px; text-align:right;">
+			<button id="custom-dim-close-btn" class="small-round" style="background:#666; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;" data-i18n="close">关闭</button>
+		</div>
+	</div>
+</div>
+
+<!-- 快捷键捕获弹窗 -->
+<div class="modal" id="sc-modal">
+	<div class="modal-content" style="max-width:280px; background:#2a2a3e; color:#ddd; border-radius:8px; padding:16px; text-align:center;">
+		<p id="sc-modal-title" style="margin:0 0 12px 0; font-size:13px;"></p>
+		<div id="sc-modal-keys" style="font-size:22px; font-family:monospace; color:#ffc247; padding:12px; background:#1a1a2e; border-radius:4px; margin-bottom:12px; min-height:32px;" data-i18n="sc-prompt">按下快捷键...</div>
+		<p style="font-size:10px; color:#888;" data-i18n="sc-hint">支持同时按两键，如 A+B、Alt+Q</p>
+		<button id="sc-modal-clear" class="small-round" style="background:#d32f2f; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer; margin-right:8px;" data-i18n="sc-clear">清除</button>
+		<button id="sc-modal-save" class="small-round" style="background:#4CAF50; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;" data-i18n="save">保存</button>
+		<button id="sc-modal-close" class="small-round" style="background:#666; color:#fff; border:none; padding:4px 12px; border-radius:4px; cursor:pointer; margin-left:8px;" data-i18n="sc-cancel">取消</button>
+	</div>
 </div>
 
 <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.10.5/dist/cdn/beer.min.js"></script>
