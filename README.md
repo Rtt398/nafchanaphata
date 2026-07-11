@@ -29,16 +29,20 @@ examples
   - [x] 2次元譜線
   - [x] 6D・7Dの追加
   - [x] ノートのコピー
-  - [x] キーバインド (Ctrl-Zのみ)
-  - [ ] ホイールでもズーム
-  - [ ] オートスクロール
+  - [x] キーバインド (Ctrl+Z)
+  - [x] その他のキーバインド (Ctrl+A/C/V、Tab+数字による時値分解能の高速変更、Ctrl+マウススライドでのノート選択、数字または Ctrl+数字による次元拡張の高速追加、Shift 同時押しで再帰的追加が可能。)(Microtonia)
+  - [x] ホイールでもズーム(Microtonia)
+  - [x] オートスクロール(Microtonia)
   - [ ] 当たり判定改善
 ### 中程度 (追加したい)
 - [ ] 明背景テーマ
-- [ ] エクスポート(オーディオ、MIDI、動画？)
-- [ ] チュートリアル
+- [*] エクスポート(オーディオ出力、naf形式プロジェクトファイル、各種平均律/微分音MIDIのインポート/エクスポート機能は実装済み。ビデオエクスポート機能は未実装。)(Microtonia)
+- [*] チュートリアル(現時点では、Hキーを押すか、Configパネル内から開くユーザーマニュアルのみ実装しています。)(Microtonia)
 ### 低い (需要があれば検討)
-- [ ] テンポ、主音の途中変更
+- [x] テンポ、主音の途中変更(Microtonia)
+- [x] 音符に色彩を追加(私自身の共感覚と趣味で追加したものです。もし不要でしたら、お手数ですが削除いただいて構いません。)(Microtonia)
+- [x] 根音記号を削除(Microtonia)
+- [x] 音符および次元線の透明度・太さ・クリック可否を設定可能に(Microtonia)
 - [ ] マルチパート、ドラムパート
 - [ ] リバーブ処理など
 
@@ -60,3 +64,6 @@ examples
 - [rtt398@gmail.com](mailto:rtt398@gmail.com)
 - [rtt398@マシュマロ](https://marshmallow-qa.com/rtt398)
 - [rtt398.web.fc2.com](https://rtt398.web.fc2.com/)
+## Contributor
+### Microtonia
+- [Microtonia@twitter](https://x.com/Microtonia)
