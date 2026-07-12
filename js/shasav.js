@@ -156,11 +156,12 @@ $('#config-note-thickness').addEventListener('input', function(e) {
 	rootlayer.batchDraw()
 })
 
-// 全局：音符透明度
-// グローバル：音符の不透明度 // Global: note opacity
+// 全局：音符透明度 — 使用 layer 级 opacity 避免每帧 N 次 GPU 合成
+// グローバル：音符の不透明度 — layerレベルで一度だけ合成 // Global: note opacity — layer-level to avoid per-frame N GPU blends
 $('#config-note-opacity').addEventListener('input', function(e) {
 	const v = parseInt(this.value) / 100
-	for (const n of rootlayer.getChildren()) n.setNoteOpacityRecursive(v)
+	rootlayer.opacity(v)  // layer 级：所有音符一次 GPU 合成，而非逐个 shape 做 alpha blending
+	for (const n of rootlayer.getChildren()) n._noteOpacity = v  // 记录值供弹窗读取
 	rootlayer.batchDraw()
 })
 
@@ -491,6 +492,7 @@ $('#roothide').addEventListener('pointerdown', e => {
 	e.stopPropagation()
 	e.preventDefault()
 	history.snapshot()
+	rootlayer.opacity(1)  // 清除 layer 级 opacity，改用 per-shape
 	// 有选区时批量切换所有选中音符 // 選択がある場合は全選択音符を一括切替 // Batch toggle all selected notes
 	if (window._sel?.selected?.size > 0) {
 		const roots = new Set()
@@ -516,6 +518,7 @@ $('#hide').addEventListener('pointerdown', e => {
 	e.stopPropagation()
 	e.preventDefault()
 	history.snapshot()
+	rootlayer.opacity(1)  // 清除 layer 级 opacity，改用 per-shape
 	// 有选区时批量切换所有选中音符 // 選択がある場合は全選択音符を一括切替 // Batch toggle all selected notes
 	if (window._sel?.selected?.size > 0) {
 		const roots = new Set()
@@ -624,9 +627,10 @@ $('#root-note-thick').addEventListener('input', e => {
 	for (const n of nodes) n.setPitchThickRecursive(v)
 	rootlayer.batchDraw()
 })
-// 每音：音符透明度 (root) — 有选区时批量应用
+// 每音：音符透明度 (root) — 有选区时批量应用，重置 layer 级 opacity
 $('#root-note-opacity').addEventListener('input', e => {
 	history.snapshot()
+	rootlayer.opacity(1)  // 清除 layer 级 opacity，改用 per-shape opacity
 	const v = parseInt(e.target.value) / 100
 	const nodes = _selectedRoots(stage.current)
 	for (const n of nodes) n.setNoteOpacityRecursive(v)
@@ -669,9 +673,10 @@ $('#note-thick').addEventListener('input', e => {
 	for (const n of nodes) n.pitchThick = v
 	rootlayer.batchDraw()
 })
-// 每音：音符透明度 (sub) — 有选区时批量应用
+// 每音：音符透明度 (sub) — 有选区时批量应用，重置 layer 级 opacity
 $('#note-opacity').addEventListener('input', e => {
 	history.snapshot()
+	rootlayer.opacity(1)  // 清除 layer 级 opacity
 	const v = parseInt(e.target.value) / 100
 	const nodes = _selectedNotes(stage.current)
 	for (const n of nodes) n.noteOpacity = v
