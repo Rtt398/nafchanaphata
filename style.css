@@ -4,7 +4,7 @@
 
 @font-face {
 	font-family: "ShasavMusic";
-	src: url("shasav.otf");
+	src: url("asset/fonts/shasav.otf");
 }
 :root {
 	--font-icon: "Material Symbols Rounded";
