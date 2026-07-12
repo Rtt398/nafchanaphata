@@ -188,6 +188,101 @@ $('#config-root-mark').addEventListener('change', function(e) {
 	rootlayer.batchDraw()
 })
 
+// ========== 背景自定义：颜色 / 透明度 / 图片 ==========
+// ========== 背景カスタマイズ：色 / 透明度 / 画像 ==========
+// ========== Background customization: color / opacity / image ==========
+
+// 应用背景设置到 #sequencer // 背景設定を #sequencer に適用 // Apply background settings to #sequencer
+function applyBackground() {
+	const seq = $('#sequencer')
+	const color = $('#config-bg-color').value
+	const opacity = parseInt($('#config-bg-opacity').value) / 100
+	const image = localStorage.getItem('naf_bg_image') || ''
+
+	// 将 hex 转为 rgba // hex を rgba に変換 // Convert hex to rgba
+	const r = parseInt(color.slice(1, 3), 16)
+	const g = parseInt(color.slice(3, 5), 16)
+	const b = parseInt(color.slice(5, 7), 16)
+	const rgba = `rgba(${r},${g},${b},${opacity})`
+
+	if (image) {
+		// 有图片：用 linear-gradient 做半透明颜色叠加
+		seq.style.background = `linear-gradient(${rgba}, ${rgba}), url(${image})`
+		seq.style.backgroundSize = 'auto, cover'
+		seq.style.backgroundPosition = 'center'
+		seq.style.backgroundRepeat = 'no-repeat'
+		seq.style.backgroundColor = ''
+	} else {
+		seq.style.background = ''
+		seq.style.backgroundColor = rgba
+	}
+
+	// 持久化 // 永続化 // Persist
+	localStorage.setItem('naf_bg_color', color)
+	localStorage.setItem('naf_bg_opacity', $('#config-bg-opacity').value)
+}
+
+// 颜色选择 // 色選択 // Color picker
+$('#config-bg-color').addEventListener('input', applyBackground)
+
+// 透明度滑块 // 透明度スライダー // Opacity slider
+$('#config-bg-opacity').addEventListener('input', applyBackground)
+
+// URL 输入 // URL 入力 // URL input
+$('#config-bg-image-url').addEventListener('change', function(e) {
+	const url = this.value.trim()
+	if (url) {
+		localStorage.setItem('naf_bg_image', url)
+		$('#config-bg-image-clear').style.display = ''
+	} else {
+		localStorage.removeItem('naf_bg_image')
+		$('#config-bg-image-clear').style.display = 'none'
+	}
+	applyBackground()
+})
+
+// 选择本地文件 // ローカルファイル選択 // Choose local file
+$('#config-bg-image-choose').addEventListener('click', function(e) {
+	$('#config-bg-image-file').click()
+})
+
+// 文件读取 // ファイル読み込み // File reader
+$('#config-bg-image-file').addEventListener('change', function(e) {
+	const file = this.files[0]
+	if (!file) return
+	const reader = new FileReader()
+	reader.onload = function(ev) {
+		const dataUrl = ev.target.result
+		localStorage.setItem('naf_bg_image', dataUrl)
+		$('#config-bg-image-clear').style.display = ''
+		$('#config-bg-image-url').value = ''
+		applyBackground()
+	}
+	reader.readAsDataURL(file)
+})
+
+// 清除背景图片 // 背景画像をクリア // Clear background image
+$('#config-bg-image-clear').addEventListener('click', function(e) {
+	localStorage.removeItem('naf_bg_image')
+	$('#config-bg-image-url').value = ''
+	$('#config-bg-image-file').value = ''
+	this.style.display = 'none'
+	applyBackground()
+})
+
+// 初始化：从 localStorage 恢复背景设置 // 初期化：localStorage から背景設定を復元 // Init: restore background from localStorage
+{
+	const savedColor = localStorage.getItem('naf_bg_color')
+	const savedOpacity = localStorage.getItem('naf_bg_opacity')
+	const savedImage = localStorage.getItem('naf_bg_image')
+	if (savedColor) $('#config-bg-color').value = savedColor
+	if (savedOpacity) $('#config-bg-opacity').value = savedOpacity
+	if (savedImage) {
+		$('#config-bg-image-clear').style.display = ''
+	}
+	applyBackground()
+}
+
 // 卷帘模式切换 // ピアノロールモード切替 // Piano roll mode toggle
 $('#config-pianoroll').addEventListener('change', function(e) {
 	grid.setPianoRoll(this.checked)

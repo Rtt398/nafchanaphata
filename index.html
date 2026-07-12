@@ -398,6 +398,26 @@
 		</label>
 	</nav>
 	<nav>
+		<span class="max" data-i18n="bg-color">背景颜色</span>
+		<input id="config-bg-color" type="color" value="#676681" style="width:36px;height:28px;border:1px solid #555;border-radius:4px;cursor:pointer;background:none;">
+	</nav>
+	<nav>
+		<span class="max" data-i18n="bg-opacity">背景透明度</span>
+		<label class="slider">
+			<input id="config-bg-opacity" type="range" value="100" min="0" max="100">
+			<span></span><div class="tooltip small-padding"></div>
+		</label>
+	</nav>
+	<nav>
+		<span class="max" data-i18n="bg-image">背景图片</span>
+		<div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+			<input id="config-bg-image-url" type="text" placeholder="URL" style="width:120px;background:#3a3a56;color:#fff;border:1px solid #555;border-radius:4px;padding:4px 6px;font-size:12px;">
+			<label class="btn small round" id="config-bg-image-choose" style="cursor:pointer;margin:0;padding:2px 8px;font-size:11px;" data-i18n="bg-image-choose">选择文件</label>
+			<button id="config-bg-image-clear" class="small round" style="background:#d32f2f;color:#fff;border:none;padding:2px 8px;font-size:11px;border-radius:4px;cursor:pointer;display:none;" data-i18n="bg-image-clear">清除</button>
+		</div>
+		<input id="config-bg-image-file" type="file" accept="image/*" style="display:none;">
+	</nav>
+	<nav>
 		<span class="max" data-i18n="root-mark">根音箭头</span>
 		<label class="checkbox">
 			<input id="config-root-mark" type="checkbox" checked><span></span>
