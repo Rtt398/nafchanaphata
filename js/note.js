@@ -126,6 +126,7 @@ export class Note extends Konva.Group {
 		this._pitchThick = parseFloat($('#config-note-thickness')?.value) || 3
 		this._linkThick = parseFloat($('#config-link-thickness')?.value) || 1
 		this._linkOpacity = 1
+		this._noteOpacity = 1
 		
 		// 音符点击处理器：选中、播放、弹出菜单 // 音符クリックハンドラ：選択、再生、ポップアップメニュー // Note click handler: select, play, popup menu
 		this.pitchline.on('pointerclick', e => {
@@ -152,9 +153,11 @@ export class Note extends Konva.Group {
 			const ntSlider = $(`#${p}note-thick`)
 			const ltSlider = $(`#${p}link-thick`)
 			const loSlider = $(`#${p}link-opacity`)
+			const noSlider = $(`#${p}note-opacity`)
 			if (ntSlider) ntSlider.value = this._pitchThick
 			if (ltSlider) ltSlider.value = this._linkThick
 			if (loSlider) loSlider.value = this._linkOpacity
+			if (noSlider) noSlider.value = (this._noteOpacity || 1) * 100
 			$(`#overlay`).style.visibility = "visible"
 			window._renderExtShortcuts?.(this.type ? this.type + '-' : '')
 			const menu = $(`#${this.type}menu`)
@@ -201,6 +204,16 @@ export class Note extends Konva.Group {
 	setPitchThickRecursive(v) {
 		this.pitchThick = v
 		for (const c of this.childNotes.getChildren()) c.setPitchThickRecursive(v)
+	}
+	get noteOpacity() { return this._noteOpacity }
+	set noteOpacity(v) {
+		this._noteOpacity = v
+		this.pitchline.opacity(v)
+		if (this.mark) this.mark.opacity(v)
+	}
+	setNoteOpacityRecursive(v) {
+		this.noteOpacity = v
+		for (const c of this.childNotes.getChildren()) c.setNoteOpacityRecursive(v)
 	}
 	get linkThick()   { return this._linkThick }
 	set linkThick(v)  { this._linkThick = v }
@@ -292,7 +305,7 @@ export class Note extends Konva.Group {
 	get hidden() { return this._hidden }
 	set hidden(v) {
 		this._hidden = v
-		const opacity = v ? 0.25 : 1
+		const opacity = v ? 0.25 : this._noteOpacity
 		_setHiddenRecursive(this, v, opacity)
 		// 确保立即重绘
 		this.pitchline.getLayer()?.batchDraw()

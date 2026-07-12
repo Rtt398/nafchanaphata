@@ -156,6 +156,14 @@ $('#config-note-thickness').addEventListener('input', function(e) {
 	rootlayer.draw()
 })
 
+// 全局：音符透明度
+// グローバル：音符の不透明度 // Global: note opacity
+$('#config-note-opacity').addEventListener('input', function(e) {
+	const v = parseInt(this.value) / 100
+	for (const n of rootlayer.getChildren()) n.setNoteOpacityRecursive(v)
+	rootlayer.draw()
+})
+
 // 全局：维度连线粗细
 // グローバル：次元リンクの太さ // Global: dimension link thickness
 $('#config-link-thickness').addEventListener('input', function(e) {
@@ -478,26 +486,53 @@ $('#rootdelete').addEventListener('click', e => {
 	$('#rootmenu').style.top = ''
 })
 
-// 隐藏/显示根音 // ルート音を非表示/表示 // Hide/show root note
+// 隐藏/显示根音（有选区时批量切换选中音符）// ルート音を非表示/表示（選択時は一括切替）// Hide/show root note (batch toggle when selection exists)
 $('#roothide').addEventListener('pointerdown', e => {
 	e.stopPropagation()
 	e.preventDefault()
-	if (!stage.current) return
 	history.snapshot()
-	const target = stage.current.root || stage.current
-	target.hidden = !target.hidden
-	target.pitchline.getLayer()?.draw()
+	// 有选区时批量切换所有选中音符 // 選択がある場合は全選択音符を一括切替 // Batch toggle all selected notes
+	if (window._sel?.selected?.size > 0) {
+		const roots = new Set()
+		for (const note of window._sel.selected) {
+			roots.add(note.root || note)
+		}
+		// 根据第一个选中的状态决定全部切换为相反状态 // 最初の選択状態に基づいて全音符を逆の状態に // Toggle all to opposite of first
+		const firstRoot = [...roots][0]
+		const newHidden = !firstRoot.hidden
+		for (const r of roots) {
+			r.hidden = newHidden
+		}
+	} else {
+		if (!stage.current) return
+		const target = stage.current.root || stage.current
+		target.hidden = !target.hidden
+	}
+	rootlayer.draw()
 })
 
-// 隐藏/显示子音符 // 子音符を非表示/表示 // Hide/show child note
+// 隐藏/显示子音符（有选区时批量切换选中音符）// 子音符を非表示/表示（選択時は一括切替）// Hide/show child note (batch toggle when selection exists)
 $('#hide').addEventListener('pointerdown', e => {
 	e.stopPropagation()
 	e.preventDefault()
-	if (!stage.current) return
 	history.snapshot()
-	const target = stage.current.root || stage.current
-	target.hidden = !target.hidden
-	target.pitchline.getLayer()?.draw()
+	// 有选区时批量切换所有选中音符 // 選択がある場合は全選択音符を一括切替 // Batch toggle all selected notes
+	if (window._sel?.selected?.size > 0) {
+		const roots = new Set()
+		for (const note of window._sel.selected) {
+			roots.add(note.root || note)
+		}
+		const firstRoot = [...roots][0]
+		const newHidden = !firstRoot.hidden
+		for (const r of roots) {
+			r.hidden = newHidden
+		}
+	} else {
+		if (!stage.current) return
+		const target = stage.current.root || stage.current
+		target.hidden = !target.hidden
+	}
+	rootlayer.draw()
 })
 
 // 提升子音符为根音 // 子音符をルート音に昇格 // Promote child note to root
@@ -556,70 +591,127 @@ $('#volume').addEventListener('change', e => {
 	stage.current.volume = e.target.value
 })
 
-// 每音：横线粗细 (root)
-// 音符ごと：横線の太さ（ルート）// Per-note: pitch line thickness (root)
+// 辅助函数：获取选中的根音集合（有选区时返回去重的根音列表，否则返回当前音符的根）
+// ヘルパー関数：選択されたルート音のセットを取得（選択時は重複除去したリスト、なければ現在の音符のルート）
+// Helper: get selected root notes (deduplicated roots if selection exists, else current note's root)
+function _selectedRoots(current) {
+	if (window._sel?.selected?.size > 0) {
+		const roots = new Set()
+		for (const note of window._sel.selected) {
+			roots.add(note.root || note)
+		}
+		return [...roots]
+	}
+	return current ? [current.root || current] : []
+}
+// 辅助函数：获取选中的音符列表（有选区时返回所有选中音符，否则返回当前音符）
+// ヘルパー関数：選択された音符のリストを取得（選択時は全選択音符、なければ現在の音符）
+// Helper: get selected notes (all selected notes if selection exists, else current note)
+function _selectedNotes(current) {
+	if (window._sel?.selected?.size > 0) {
+		return [...window._sel.selected]
+	}
+	return current ? [current] : []
+}
+
+// 每音：横线粗细 (root) — 有选区时批量应用
+// 音符ごと：横線の太さ（ルート）— 選択時は一括適用
+// Per-note: pitch line thickness (root) — batch apply when selection exists
 $('#root-note-thick').addEventListener('input', e => {
-	if (!stage.current) return
 	history.snapshot()
-	stage.current.pitchThick = parseFloat(e.target.value)
+	const v = parseFloat(e.target.value)
+	const nodes = _selectedRoots(stage.current)
+	for (const n of nodes) n.setPitchThickRecursive(v)
 	rootlayer.draw()
 })
-// 每音：连线粗细 (root)
-// 音符ごと：リンクの太さ（ルート）// Per-note: link thickness (root)
+// 每音：音符透明度 (root) — 有选区时批量应用
+$('#root-note-opacity').addEventListener('input', e => {
+	history.snapshot()
+	const v = parseInt(e.target.value) / 100
+	const nodes = _selectedRoots(stage.current)
+	for (const n of nodes) n.setNoteOpacityRecursive(v)
+	rootlayer.draw()
+})
+// 每音：连线粗细 (root) — 有选区时批量应用
+// 音符ごと：リンクの太さ（ルート）— 選択時は一括適用
+// Per-note: link thickness (root) — batch apply when selection exists
 $('#root-link-thick').addEventListener('input', e => {
-	if (!stage.current) return
 	history.snapshot()
-	stage.current.linkThick = parseFloat(e.target.value)
-	stage.current.applyLinkStyle()
+	const v = parseFloat(e.target.value)
+	const nodes = _selectedRoots(stage.current)
+	for (const n of nodes) {
+		n.linkThick = v
+		n.applyLinkStyle()
+	}
 	rootlayer.draw()
 })
-// 每音：连线透明度 (root)
-// 音符ごと：リンク不透明度（ルート）// Per-note: link opacity (root)
+// 每音：连线透明度 (root) — 有选区时批量应用
+// 音符ごと：リンク不透明度（ルート）— 選択時は一括適用
+// Per-note: link opacity (root) — batch apply when selection exists
 $('#root-link-opacity').addEventListener('input', e => {
-	if (!stage.current) return
 	history.snapshot()
-	stage.current.linkOpacity = parseInt(e.target.value) / 100
-	stage.current.applyLinkStyle()
+	const v = parseInt(e.target.value) / 100
+	const nodes = _selectedRoots(stage.current)
+	for (const n of nodes) {
+		n.setLinkOpacityRecursive(v)
+		n.applyLinkStyle()
+	}
 	rootlayer.draw()
 })
 
-// 每音：横线粗细 (sub)
-// 音符ごと：横線の太さ（サブ）// Per-note: pitch line thickness (sub)
+// 每音：横线粗细 (sub) — 有选区时批量应用
+// 音符ごと：横線の太さ（サブ）— 選択時は一括適用
+// Per-note: pitch line thickness (sub) — batch apply when selection exists
 $('#note-thick').addEventListener('input', e => {
-	if (!stage.current) return
 	history.snapshot()
-	stage.current.pitchThick = parseFloat(e.target.value)
+	const v = parseFloat(e.target.value)
+	const nodes = _selectedNotes(stage.current)
+	for (const n of nodes) n.pitchThick = v
 	rootlayer.draw()
 })
-// 每音：连线粗细 (sub) — 仅影响该子音自己的维度连线
-// 音符ごと：リンクの太さ（サブ）— その子音自身の次元リンクのみに影響
-// Per-note: link thickness (sub) — only affects that child note's own dimension link
+// 每音：音符透明度 (sub) — 有选区时批量应用
+$('#note-opacity').addEventListener('input', e => {
+	history.snapshot()
+	const v = parseInt(e.target.value) / 100
+	const nodes = _selectedNotes(stage.current)
+	for (const n of nodes) n.noteOpacity = v
+	rootlayer.draw()
+})
+// 每音：连线粗细 (sub) — 有选区时批量应用，仅影响该子音自己的维度连线
+// 音符ごと：リンクの太さ（サブ）— 選択時は一括適用、その子音自身の次元リンクのみ
+// Per-note: link thickness (sub) — batch apply, only affects that child note's own dimension link
 $('#link-thick').addEventListener('input', e => {
-	if (!stage.current) return
 	history.snapshot()
-	stage.current.linkThick = parseFloat(e.target.value)
-	if (stage.current.linkLine) stage.current.linkLine.setAttrs(stage.current.lineConfig)
+	const v = parseFloat(e.target.value)
+	const nodes = _selectedNotes(stage.current)
+	for (const n of nodes) {
+		n.linkThick = v
+		if (n.linkLine) n.linkLine.setAttrs(n.lineConfig)
+	}
 	rootlayer.draw()
 })
-// 每音：连线透明度 (sub) — 仅影响该子音自己的维度连线
-// 音符ごと：リンク不透明度（サブ）— その子音自身の次元リンクのみに影響
-// Per-note: link opacity (sub) — only affects that child note's own dimension link
+// 每音：连线透明度 (sub) — 有选区时批量应用，仅影响该子音自己的维度连线
+// 音符ごと：リンク不透明度（サブ）— 選択時は一括適用、その子音自身の次元リンクのみ
+// Per-note: link opacity (sub) — batch apply, only affects that child note's own dimension link
 $('#link-opacity').addEventListener('input', e => {
-	if (!stage.current) return
 	history.snapshot()
-	stage.current.linkOpacity = parseInt(e.target.value) / 100
-	if (stage.current.linkLine) stage.current.linkLine.opacity(stage.current.linkOpacity)
+	const v = parseInt(e.target.value) / 100
+	const nodes = _selectedNotes(stage.current)
+	for (const n of nodes) {
+		n.linkOpacity = v
+		if (n.linkLine) n.linkLine.opacity(v)
+	}
 	rootlayer.draw()
 })
 
-// 静音按钮 // ミュートボタン // Mute buttons
+// 静音按钮（有选区时批量切换）// ミュートボタン（選択時は一括切替）// Mute buttons (batch toggle when selection exists)
 for (const el of $$('.mute-btn')) {
 	el.addEventListener('change', function(e) {
-		if (stage.current) {
-			history.snapshot()
-			stage.current.mute = this.checked
-			rootlayer.draw()
-		}
+		history.snapshot()
+		const nodes = _selectedNotes(stage.current)
+		const v = this.checked
+		for (const n of nodes) n.mute = v
+		rootlayer.draw()
 	})
 }
 
