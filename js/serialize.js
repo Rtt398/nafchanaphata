@@ -54,6 +54,8 @@ export class Serializer {
 			pt: note._pitchThick,
 			lt: note._linkThick,
 			lo: note._linkOpacity,
+			no: note._noteOpacity,
+			tk: note._tick,
 			s: note.childNotes.children.map(x => this.sub2json(x))
 		}
 	}
@@ -72,11 +74,13 @@ export class Serializer {
 			pt: note._pitchThick,
 			lt: note._linkThick,
 			lo: note._linkOpacity,
+			no: note._noteOpacity,
+			tk: note._tick,
 			s: note.childNotes.children.map(x => this.sub2json(x))
 		}
 	}
 
-	// 反序列化：从 JSON 字符串重建工程（自动检测纯 JSON 或 crush 压缩格式）
+	// 从 JSON 反序列化根音符字符串重建工程（自动检测纯 JSON 或 crush 压缩格式）
 	// デシリアライズ：JSON文字列からプロジェクトを再構築（純粋JSONまたはcrush圧縮形式を自動検出）
 	// Deserialize from JSON string: rebuild project (auto-detect plain JSON or crush-compressed format)
 	static deserialize(d) {
@@ -102,7 +106,7 @@ export class Serializer {
 		}
 		if (!u.n) return
 		for (const n of u.n) {
-			const p = new RootNote(stage, n.x / 4 || 0, hz2y(n.h / hzDiv), n.l / 4)
+			const p = new RootNote(stage, n.x / 4 || 0, hz2y(n.h / hzDiv), n.l / 4, null, null, n.tk)
 			p.mute = n.m || false
 			p.volume = 50 + (n.v || 0)
 			p.hidden = !!(n.hd)  // 恢复隐藏状态 / 非表示状態を復元 / Restore hidden state
@@ -110,7 +114,11 @@ export class Serializer {
 			p._pitchThick = n.pt || p._pitchThick
 			p._linkThick = n.lt || p._linkThick
 			p._linkOpacity = n.lo || p._linkOpacity
+			p._noteOpacity = n.no ?? p._noteOpacity
+			p._tick = n.tk || p._tick
 			p.pitchline.strokeWidth(p._pitchThick)
+			p.pitchline.opacity(p._noteOpacity)
+			if (p.mark) p.mark.opacity(p._noteOpacity)
 			if (p._linkThick !== 1 || p._linkOpacity !== 1) p.applyLinkStyle()
 			rootlayer.add(p)
 			for (const m of n.s || []) {
@@ -145,7 +153,10 @@ export class Serializer {
 		q._pitchThick = m.pt || q._pitchThick
 		q._linkThick = m.lt || q._linkThick
 		q._linkOpacity = m.lo || q._linkOpacity
+		q._noteOpacity = m.no ?? q._noteOpacity
+		q._tick = m.tk || q._tick
 		q.pitchline.strokeWidth(q._pitchThick)
+		q.pitchline.opacity(q._noteOpacity)
 		if (q.linkLine) q.linkLine.opacity(q._linkOpacity)
 		for (const l of m.s || []) {
 			this.json2sub(q, l, hzDiv)

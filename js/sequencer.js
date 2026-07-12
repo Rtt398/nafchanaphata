@@ -8,7 +8,7 @@ import {makePincher} from './pincher.js'
 import {Grid} from './grid.js'
 import {RootNote} from './note.js'
 import history from './history.js'
-import { x2t, OFFSET } from './util.js'
+import { x2t, qh, OFFSET } from './util.js'
 
 // Konva 舞台设置：全屏可拖拽画布
 // Konvaステージ設定：全画面ドラッグ可能キャンバス
@@ -66,7 +66,8 @@ stage.on('pointerclick', e => {
 	const tick = tickEl ? (parseInt(tickEl.value) || 1) : 1
 	const fixLenEl = document.getElementById('config-fixed-note-len')
 	const len = (fixLenEl?.checked && tick >= 1) ? 48 / tick : 48
-	const root = new RootNote(stage, pos.x, pos.y, len)
+	// 点击时用量化位置创建音符，之后音符不再受分辨率影响
+	const root = new RootNote(stage, qh(pos.x), pos.y, len)
 	rootlayer.add(root)
 	stage.current = root
 	root.playThis()

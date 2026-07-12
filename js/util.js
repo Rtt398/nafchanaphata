@@ -79,18 +79,16 @@ export const qs = hz => {
 	const step = Math.round(Math.log2(hz / tonic) * edo)
 	return tonic * 2 ** (step / edo)
 }
-// 起始位置量化（吸附到网格） / 開始位置クオンタイズ（グリッドスナップ） / Head position quantization (snap to grid)
-export const qh = x => {
-	// 1 beat = 48 tick
-	const tick = $('#config-tick').value
+// 起始位置量化（吸附到网格，tick 参数可覆盖当前分辨率） / 開始位置クオンタイズ（グリッドスナップ、tickで上書き可） / Head position quantization (snap to grid, tick overrides current resolution)
+export const qh = (x, tick) => {
+	if (tick == null) tick = $('#config-tick').value
 	const head = $('#config-quantize-head').checked
 	if (!tick || !head) return x
 	return Math.round(x * tick / 48) * 48 / tick
 }
-// 结束位置量化（吸附到网格） / 終了位置クオンタイズ（グリッドスナップ） / Tail position quantization (snap to grid)
-export const qt = x => {
-	// 1 beat = 48 tick
-	const tick = $('#config-tick').value
+// 结束位置量化（吸附到网格，tick 参数可覆盖当前分辨率） / 終了位置クオンタイズ（グリッドスナップ、tickで上書き可） / Tail position quantization (snap to grid, tick overrides current resolution)
+export const qt = (x, tick) => {
+	if (tick == null) tick = $('#config-tick').value
 	const tail = $('#config-quantize-tail').checked
 	if (!tick || !tail) return x
 	return Math.round(x * tick / 48) * 48 / tick

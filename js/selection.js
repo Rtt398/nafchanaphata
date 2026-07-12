@@ -320,6 +320,8 @@ export const Select = {
 			pitchThick: note._pitchThick,
 			linkThick: note._linkThick,
 			linkOpacity: note._linkOpacity,
+			noteOpacity: note._noteOpacity,
+			tick: note._tick,
 			_isRoot: note instanceof RootNote,
 			intId: note._interval?.id,
 			delay: note.delay || 0,
@@ -332,7 +334,7 @@ export const Select = {
 	// JSON から RootNote を復元：完全なコードツリーを含む
 	// Restore RootNote from JSON: including the full chord tree
 	_jsonToRoot(json, ox, oy) {
-		const note = new RootNote(stage, json.x + ox, json.y + oy, json.len)
+		const note = new RootNote(stage, json.x + ox, json.y + oy, json.len, null, null, json.tick)
 		rootlayer.add(note)
 		note.mute = json.mute
 		note.hidden = json.hidden || false
@@ -340,7 +342,11 @@ export const Select = {
 		if (json.pitchThick) note._pitchThick = json.pitchThick
 		if (json.linkThick) note._linkThick = json.linkThick
 		if (json.linkOpacity) note._linkOpacity = json.linkOpacity
+		if (json.noteOpacity != null) note._noteOpacity = json.noteOpacity
+		if (json.tick) note._tick = json.tick
 		note.pitchline.strokeWidth(note._pitchThick)
+		note.pitchline.opacity(note._noteOpacity)
+		if (note.mark) note.mark.opacity(note._noteOpacity)
 		// 恢复子音符
 		for (const cj of json.children || []) {
 			this._jsonToSub(note, cj, 0, 0)
@@ -368,7 +374,10 @@ export const Select = {
 		if (json.pitchThick) sub._pitchThick = json.pitchThick
 		if (json.linkThick) sub._linkThick = json.linkThick
 		if (json.linkOpacity) sub._linkOpacity = json.linkOpacity
+		if (json.noteOpacity != null) sub._noteOpacity = json.noteOpacity
+		if (json.tick) sub._tick = json.tick
 		sub.pitchline.strokeWidth(sub._pitchThick)
+		sub.pitchline.opacity(sub._noteOpacity)
 		if (sub.linkLine) sub.linkLine.opacity(sub._linkOpacity)
 		for (const cj of json.children || []) {
 			this._jsonToSub(sub, cj, 0, 0)

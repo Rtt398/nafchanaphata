@@ -102,7 +102,7 @@ function hzToRgbString(hz) {
 // Note 基底クラス：すべての音符の共通抽象、ピッチライン、子音符ツリー、再生/ミュート/非表示などのコア機能を含む
 // Note base class: common abstraction for all notes, includes pitch line, child note tree, play/mute/hide core functionality
 export class Note extends Konva.Group {
-	constructor(stage, opt, len, delay = null, interval = null) {
+	constructor(stage, opt, len, delay = null, interval = null, tick = null) {
 		super(opt)
 		this.stage = stage
 		this.pitchline = new Konva.Line({
@@ -115,6 +115,7 @@ export class Note extends Konva.Group {
 		})
 		this.delay = delay
 		this._len = len
+		this._tick = tick || parseInt($('#config-tick').value) || 1  // 记录创建时的分辨率，拖拽时保持一致的量化行为
 		this._interval = interval
 		this.volume = 50
 		this.isMuted = false
@@ -333,12 +334,12 @@ export class Note extends Konva.Group {
 // RootNote クラス：ルート音、コードツリーの最上位ノード、ドラッグ（移動/先頭伸縮/末尾伸縮）と Shift モードをサポート
 // RootNote class: root note, top-level node of the chord tree, supports drag (move/stretch head/stretch tail) and Shift mode
 export class RootNote extends Note {
-	constructor(stage, x, y, len, hz, interval) {
+	constructor(stage, x, y, len, hz, interval, tick) {
 		super(stage, {
-			x: qh(x),
+			x: x,
 			y: hz2y(qb(y2hz(y))),
 			draggable: true
-		}, len, 0, interval)
+		}, len, 0, interval, tick)
 		this.type = 'root'
 		this._hz = hz || qb(y2hz(y))
 		this._needsBuild = true   // 延迟构建，避免每次添加子音都重建
@@ -384,19 +385,19 @@ export class RootNote extends Note {
 		.on('dragmove', e => {
 			switch (this.stage.dragMode) {
 				case 'head':
-					this.len = Math.max(10, this.origTailX - qh(this.x()))
-					this.x(qh(this.x()))
+					this.len = Math.max(10, this.origTailX - qh(this.x(), this._tick))
+					this.x(qh(this.x(), this._tick))
 					this.y(this.origY)
 					// Ctrl：头部拖动时所有子音符等量缩短
 					if (this._ctrlChordDrag && this._ctrlSubs) {
-						const d = qh(this.x()) - qh(this.origX)
+						const d = qh(this.x(), this._tick) - qh(this.origX, this._tick)
 						for (const s of this._ctrlSubs) {
 							s.note.len = Math.max(10, s.origLen - d)
 						}
 					}
 					break
 				case 'tail':
-					this.len = Math.max(10, qt(this.stage.getRelativePointerPosition().x) - this.origX)
+					this.len = Math.max(10, qt(this.stage.getRelativePointerPosition().x, this._tick) - this.origX)
 					this.x(this.origX)
 					this.y(this.origY)
 					if (this._ctrlChordDrag && this._ctrlSubs) {
@@ -412,7 +413,7 @@ export class RootNote extends Note {
 					}
 					break
 				case 'body':
-					this.x(qh(this.x()))
+					this.x(qh(this.x(), this._tick))
 					this.y(this.y())
 					this.quantize()
 					// Ctrl 模式下 body 拖拽根音：子音自动跟随（它们相对根音定位），无需额外处理
@@ -624,13 +625,13 @@ export class SubNote extends Note {
 				switch (this.stage.dragMode) {
 					case 'body':
 						// 整体平移：移动根音
-						this.root.x(qh(this._ctrlOrigRootX + deltaX))
+						this.root.x(qh(this._ctrlOrigRootX + deltaX, this.root._tick))
 						this.pitchline.x(this.origX)
 						this.pitchline.y(0)
 						break
 					case 'head': {
-						const d = qh(deltaX)
-						this.root.x(qh(this._ctrlOrigRootX + d))
+						const d = qh(deltaX, this.root._tick)
+						this.root.x(qh(this._ctrlOrigRootX + d, this.root._tick))
 						this.root.len = Math.max(10, this._ctrlOrigRootLen - d)
 						this.pitchline.x(this.origX)
 						this.pitchline.y(0)
@@ -640,7 +641,7 @@ export class SubNote extends Note {
 						break
 					}
 					case 'tail': {
-						const subLen = Math.max(10, qt(this.link.getRelativePointerPosition().x) - this.origX)
+						const subLen = Math.max(10, qt(this.link.getRelativePointerPosition().x, this.root._tick) - this.origX)
 						const ratio = subLen / (this.origLen || 1)
 						this.root.len = Math.max(10, Math.round(this._ctrlOrigRootLen * ratio))
 						this.pitchline.x(this.origX)
@@ -654,17 +655,17 @@ export class SubNote extends Note {
 			} else {
 				switch (this.stage.dragMode) {
 					case 'head':
-						this.len = Math.max(10, this.origTailX - qh(this.pitchline.x()))
-						this.pitchline.x(qh(this.pitchline.x()))
+						this.len = Math.max(10, this.origTailX - qh(this.pitchline.x(), this._tick))
+						this.pitchline.x(qh(this.pitchline.x(), this._tick))
 						this.pitchline.y(0)
 						break
 					case 'tail':
-						this.len = Math.max(10, qt(this.link.getRelativePointerPosition().x) - this.origX)
+						this.len = Math.max(10, qt(this.link.getRelativePointerPosition().x, this._tick) - this.origX)
 						this.pitchline.x(this.origX)
 						this.pitchline.y(0)
 						break
 					case 'body':
-						this.pitchline.x(qh(this.pitchline.x()))
+						this.pitchline.x(qh(this.pitchline.x(), this._tick))
 						this.pitchline.y(0)
 						this.quantize()
 						// 选中组整体拖动
@@ -792,6 +793,8 @@ export class SubNote extends Note {
 		const newPitchThick = this._pitchThick
 		const newLinkThick = this._linkThick
 		const newLinkOpacity = this._linkOpacity
+		const newNoteOpacity = this._noteOpacity
+		const newTick = this._tick
 
 		// 从旧根沿路径累加 delay，得到提升音符的内容 X
 		let contentX = oldRoot.x()
@@ -832,6 +835,8 @@ export class SubNote extends Note {
 				pt: note._pitchThick,
 				lt: note._linkThick,
 				lo: note._linkOpacity,
+				no: note._noteOpacity,
+				tk: note._tick,
 				kids: note.childNotes.getChildren().map(c => saveTree(c, myAbsDelay))
 			}
 		}
@@ -841,14 +846,18 @@ export class SubNote extends Note {
 		oldRoot.destroy()
 
 		// 5. 创建新根（提升的音符），用内容坐标
-		const newRoot = new RootNote(stage, contentX, contentY, newLen, newHz)
+		const newRoot = new RootNote(stage, contentX, contentY, newLen, newHz, null, newTick)
 		newRoot.volume = newVolume
 		newRoot.mute = newMute
 		newRoot.hidden = newHidden
 		newRoot._pitchThick = newPitchThick
 		newRoot._linkThick = newLinkThick
 		newRoot._linkOpacity = newLinkOpacity
+		newRoot._noteOpacity = newNoteOpacity
+		newRoot._tick = newTick
 		newRoot.pitchline.strokeWidth(newPitchThick)
+		newRoot.pitchline.opacity(newNoteOpacity)
+		if (newRoot.mark) newRoot.mark.opacity(newNoteOpacity)
 		layer.add(newRoot)
 
 		// 6. 在树结构中找到提升节点和从旧根到提升节点的路径
@@ -895,7 +904,10 @@ export class SubNote extends Note {
 			child._pitchThick = tree.pt
 			child._linkThick = tree.lt
 			child._linkOpacity = tree.lo
+			child._noteOpacity = tree.no
+			child._tick = tree.tk
 			child.pitchline.strokeWidth(tree.pt)
+			child.pitchline.opacity(tree.no)
 			if (child.linkLine) child.linkLine.opacity(tree.lo)
 			for (const k of tree.kids) {
 				addSubtree(child, k, tree.absX)
@@ -925,7 +937,10 @@ export class SubNote extends Note {
 			sub._pitchThick = pathNode.pt
 			sub._linkThick = pathNode.lt
 			sub._linkOpacity = pathNode.lo
+			sub._noteOpacity = pathNode.no
+			sub._tick = pathNode.tk
 			sub.pitchline.strokeWidth(pathNode.pt)
+			sub.pitchline.opacity(pathNode.no)
 			if (sub.linkLine) sub.linkLine.opacity(pathNode.lo)
 			// 添加 pathNode 的非路径子音
 			for (const k of pathNode.kids) {
