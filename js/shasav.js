@@ -131,21 +131,21 @@ $('#config-color-wavelength').addEventListener('change', function(e) {
 	$('#config-color-hsl').checked = false
 	$('#config-color-white').checked = false
 	for (const n of rootlayer.getChildren()) n.updateColorRecursive()
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 $('#config-color-hsl').addEventListener('change', function(e) {
 	if (!this.checked) { this.checked = true; return }
 	$('#config-color-wavelength').checked = false
 	$('#config-color-white').checked = false
 	for (const n of rootlayer.getChildren()) n.updateColorRecursive()
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 $('#config-color-white').addEventListener('change', function(e) {
 	if (!this.checked) { this.checked = true; return }
 	$('#config-color-wavelength').checked = false
 	$('#config-color-hsl').checked = false
 	for (const n of rootlayer.getChildren()) n.updateColorRecursive()
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 全局：音符横线粗细
@@ -153,7 +153,7 @@ $('#config-color-white').addEventListener('change', function(e) {
 $('#config-note-thickness').addEventListener('input', function(e) {
 	const v = parseFloat(this.value)
 	for (const n of rootlayer.getChildren()) n.setPitchThickRecursive(v)
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 全局：音符透明度
@@ -161,7 +161,7 @@ $('#config-note-thickness').addEventListener('input', function(e) {
 $('#config-note-opacity').addEventListener('input', function(e) {
 	const v = parseInt(this.value) / 100
 	for (const n of rootlayer.getChildren()) n.setNoteOpacityRecursive(v)
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 全局：维度连线粗细
@@ -172,7 +172,7 @@ $('#config-link-thickness').addEventListener('input', function(e) {
 		n.linkThick = v
 		n.applyLinkStyle()
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 全局：维度连线透明度
@@ -183,7 +183,7 @@ $('#config-link-opacity').addEventListener('input', function(e) {
 		n.setLinkOpacityRecursive(v)
 		n.applyLinkStyle()
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 根音箭头显示开关 // ルート音矢印表示切替 // Root arrow display toggle
@@ -508,7 +508,7 @@ $('#roothide').addEventListener('pointerdown', e => {
 		const target = stage.current.root || stage.current
 		target.hidden = !target.hidden
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 隐藏/显示子音符（有选区时批量切换选中音符）// 子音符を非表示/表示（選択時は一括切替）// Hide/show child note (batch toggle when selection exists)
@@ -532,7 +532,7 @@ $('#hide').addEventListener('pointerdown', e => {
 		const target = stage.current.root || stage.current
 		target.hidden = !target.hidden
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 提升子音符为根音 // 子音符をルート音に昇格 // Promote child note to root
@@ -622,7 +622,7 @@ $('#root-note-thick').addEventListener('input', e => {
 	const v = parseFloat(e.target.value)
 	const nodes = _selectedRoots(stage.current)
 	for (const n of nodes) n.setPitchThickRecursive(v)
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 // 每音：音符透明度 (root) — 有选区时批量应用
 $('#root-note-opacity').addEventListener('input', e => {
@@ -630,7 +630,7 @@ $('#root-note-opacity').addEventListener('input', e => {
 	const v = parseInt(e.target.value) / 100
 	const nodes = _selectedRoots(stage.current)
 	for (const n of nodes) n.setNoteOpacityRecursive(v)
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 // 每音：连线粗细 (root) — 有选区时批量应用
 // 音符ごと：リンクの太さ（ルート）— 選択時は一括適用
@@ -643,7 +643,7 @@ $('#root-link-thick').addEventListener('input', e => {
 		n.linkThick = v
 		n.applyLinkStyle()
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 // 每音：连线透明度 (root) — 有选区时批量应用
 // 音符ごと：リンク不透明度（ルート）— 選択時は一括適用
@@ -656,7 +656,7 @@ $('#root-link-opacity').addEventListener('input', e => {
 		n.setLinkOpacityRecursive(v)
 		n.applyLinkStyle()
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 
 // 每音：横线粗细 (sub) — 有选区时批量应用
@@ -667,7 +667,7 @@ $('#note-thick').addEventListener('input', e => {
 	const v = parseFloat(e.target.value)
 	const nodes = _selectedNotes(stage.current)
 	for (const n of nodes) n.pitchThick = v
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 // 每音：音符透明度 (sub) — 有选区时批量应用
 $('#note-opacity').addEventListener('input', e => {
@@ -675,7 +675,7 @@ $('#note-opacity').addEventListener('input', e => {
 	const v = parseInt(e.target.value) / 100
 	const nodes = _selectedNotes(stage.current)
 	for (const n of nodes) n.noteOpacity = v
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 // 每音：连线粗细 (sub) — 有选区时批量应用，仅影响该子音自己的维度连线
 // 音符ごと：リンクの太さ（サブ）— 選択時は一括適用、その子音自身の次元リンクのみ
@@ -688,7 +688,7 @@ $('#link-thick').addEventListener('input', e => {
 		n.linkThick = v
 		if (n.linkLine) n.linkLine.setAttrs(n.lineConfig)
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
 // 每音：连线透明度 (sub) — 有选区时批量应用，仅影响该子音自己的维度连线
 // 音符ごと：リンク不透明度（サブ）— 選択時は一括適用、その子音自身の次元リンクのみ
@@ -701,9 +701,8 @@ $('#link-opacity').addEventListener('input', e => {
 		n.linkOpacity = v
 		if (n.linkLine) n.linkLine.opacity(v)
 	}
-	rootlayer.draw()
+	rootlayer.batchDraw()
 })
-
 // 静音按钮（有选区时批量切换）// ミュートボタン（選択時は一括切替）// Mute buttons (batch toggle when selection exists)
 for (const el of $$('.mute-btn')) {
 	el.addEventListener('change', function(e) {
@@ -711,7 +710,7 @@ for (const el of $$('.mute-btn')) {
 		const nodes = _selectedNotes(stage.current)
 		const v = this.checked
 		for (const n of nodes) n.mute = v
-		rootlayer.draw()
+		rootlayer.batchDraw()
 	})
 }
 

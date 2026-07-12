@@ -308,8 +308,6 @@ export class Note extends Konva.Group {
 		this._hidden = v
 		const opacity = v ? 0.25 : this._noteOpacity
 		_setHiddenRecursive(this, v, opacity)
-		// 确保立即重绘
-		this.pitchline.getLayer()?.batchDraw()
 	}
 	// 播放：触发整个音符树的声音 // 再生：音符ツリー全体の音をトリガー // Play: trigger sound for the entire note tree
 	play() {
