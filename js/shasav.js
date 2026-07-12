@@ -199,6 +199,9 @@ function applyBackground() {
 	const opacity = parseInt($('#config-bg-opacity').value) / 100
 	const image = localStorage.getItem('naf_bg_image') || ''
 
+	// 同步颜色条显示 // カラーバーを同期 // Sync color bar
+	$('#config-bg-color-bar').style.background = color
+
 	// 将 hex 转为 rgba // hex を rgba に変換 // Convert hex to rgba
 	const r = parseInt(color.slice(1, 3), 16)
 	const g = parseInt(color.slice(3, 5), 16)
