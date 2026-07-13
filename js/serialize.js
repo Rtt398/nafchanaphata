@@ -27,8 +27,9 @@ export class Serializer {
 			t: grid.tonic,
 			s: x2t(grid.loopStart.x()),
 			e: x2t(grid.loopEnd.x()),
-			i: $('#config-tone').value
-		} : { v: 2 }   // 历史快照也带版本标记，避免反序列化时 hzDiv 回退到 16 / 履歴スナップショットにもバージョンタグを付与、デシリアライズ時のhzDiv後退を防止 / History snapshots also carry version tag to prevent hzDiv fallback to 16
+			i: $('#config-tone').value,
+			o: rootlayer.opacity()
+		} : { v: 2, o: rootlayer.opacity() }   // 历史快照也带版本标记，避免反序列化时 hzDiv 回退到 16 / 履歴スナップショットにもバージョンタグを付与、デシリアライズ時のhzDiv後退を防止 / History snapshots also carry version tag to prevent hzDiv fallback to 16
 		const n = rootlayer.children.map(x => this.root2json(x))
 		const json = JSON.stringify(
 			{s: s, n: n}, 
@@ -104,12 +105,13 @@ export class Serializer {
 			$(`#config-tone>option[value='${u.s.i || "salamander-piano"}']`).selected = true
 			$('#config-tone').dispatchEvent(new Event('change'))
 		}
+		// 恢复 layer 级透明度，避免 Ctrl+Z 后音符透明度丢失
+		if (u.s && u.s.o != null) rootlayer.opacity(u.s.o)
 		if (!u.n) return
 		for (const n of u.n) {
 			const p = new RootNote(stage, n.x / 4 || 0, hz2y(n.h / hzDiv), n.l / 4, null, null, n.tk)
 			p.mute = n.m || false
 			p.volume = 50 + (n.v || 0)
-			p.hidden = !!(n.hd)  // 恢复隐藏状态 / 非表示状態を復元 / Restore hidden state
 			// 恢复外观属性 / 外観属性を復元 / Restore visual properties
 			p._pitchThick = n.pt || p._pitchThick
 			p._linkThick = n.lt || p._linkThick
@@ -119,6 +121,8 @@ export class Serializer {
 			p.pitchline.strokeWidth(p._pitchThick)
 			p.pitchline.opacity(p._noteOpacity)
 			if (p.mark) p.mark.opacity(p._noteOpacity)
+			// 恢复隐藏状态（必须在 pitchline.opacity 之后，否则会被覆盖）// 非表示状態を復元（pitchline.opacityの後でないと上書きされる）// Restore hidden state (must be after pitchline.opacity to avoid overwrite)
+			p.hidden = !!(n.hd)
 			if (p._linkThick !== 1 || p._linkOpacity !== 1) p.applyLinkStyle()
 			rootlayer.add(p)
 			for (const m of n.s || []) {
@@ -147,7 +151,6 @@ export class Serializer {
 		const q = p.addNote(m.l / 4, interval, m.d / 4 || 0)
 		q.mute = m.m || false
 		q.volume = 50 + (m.v || 0)
-		q.hidden = !!(m.hd)  // 恢复隐藏状态 / 非表示状態を復元 / Restore hidden state
 		if (m.h) q.hz = m.h / hzDiv
 		// 恢复外观属性 / 外観属性を復元 / Restore visual properties
 		q._pitchThick = m.pt || q._pitchThick
@@ -157,6 +160,8 @@ export class Serializer {
 		q._tick = m.tk || q._tick
 		q.pitchline.strokeWidth(q._pitchThick)
 		q.pitchline.opacity(q._noteOpacity)
+		// 恢复隐藏状态（必须在 pitchline.opacity 之后，否则会被覆盖）
+		q.hidden = !!(m.hd)
 		if (q.linkLine) q.linkLine.opacity(q._linkOpacity)
 		for (const l of m.s || []) {
 			this.json2sub(q, l, hzDiv)
