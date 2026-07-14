@@ -4,7 +4,7 @@
 
 @font-face {
 	font-family: "ShasavMusic";
-	src: url("shasav.otf");
+	src: url("assets/fonts/shasav.otf");
 }
 :root {
 	--font-icon: "Material Symbols Rounded";
@@ -24,7 +24,6 @@
 }
 
 body {
-	position: fixed;
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
@@ -45,37 +44,48 @@ i {
 	border-radius: 0 !important;
 }
 
-:is(.checkbox,.radio)>span:not(:empty) {
-    padding-inline-start: 0;
-}
-
 :is(nav,.row).tiny-space {
-	gap: 2%;
-	justify-content: space-between;
+	gap: 1%;
+	justify-content: center;
 }
 
 canvas {
 	image-rendering: pixelated;
 }
+#sequencer canvas {
+	max-width: none;
+}
 
 #sequencer {
 	width: 100vw;
-	height: 100lvh;
-	background-color: #676681;
-}
-
-header {
-	padding-block-end: calc(100lvh - 100dvh);
+	height: 100dvh;
 }
 
 #config {
 	width: fit-content;
-	left: 0;
-	right: 0;
-	margin: auto;
+	left: auto;
+	right: 1rem;
 	max-width: 30rem;
 	max-height: 85vh;
 	overflow: auto;
+}
+
+#help {
+	width: fit-content;
+	left: 0;
+	right: 0;
+	margin: auto;
+	max-width: 36rem;
+	max-height: 85vh;
+	overflow: auto;
+}
+#help kbd {
+	background: #3c3b59;
+	color: #ccc;
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-family: monospace;
+	font-size: 0.9em;
 }
 
 #config>nav {
@@ -101,7 +111,7 @@ header {
 }
 
 i.huge {
-	--_size: 3rem;
+	--_size: 2.75rem;
 }
 .short {
 	width: 8rem;
@@ -114,6 +124,100 @@ i.huge {
 a.disabled {
 	pointer-events: none;
 }
-span.nowrap {
-	text-wrap-mode: nowrap;
+
+/* 自定义维度弹窗 */
+#custom-dim-modal {
+	display: none;
+	position: fixed;
+	top: 0; left: 0; width: 100%; height: 100%;
+	background: rgba(0,0,0,0.6);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+}
+#harmonic-fit-modal {
+	display: none;
+	position: fixed;
+	top: 0; left: 0; width: 100%; height: 100%;
+	background: rgba(0,0,0,0.6);
+	z-index: 1000;
+	justify-content: center;
+	align-items: center;
+}
+#custom-dim-modal .modal-content,
+#harmonic-fit-modal .modal-content {
+	animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+	from { opacity: 0; transform: translateY(-10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+#custom-dim-list .dim-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 4px 8px;
+	margin: 2px 0;
+	border-radius: 4px;
+	background: #3a3a56;
+	font-size: 13px;
+}
+#custom-dim-list .dim-item:hover {
+	background: #4a4a66;
+}
+#custom-dim-list .dim-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+#custom-dim-list .dim-color {
+	width: 14px;
+	height: 14px;
+	border-radius: 2px;
+	border: 1px solid #555;
+	flex-shrink: 0;
+}
+#custom-dim-list .dim-delete-btn {
+	background: #d32f2f;
+	color: #fff;
+	border: none;
+	border-radius: 3px;
+	padding: 2px 6px;
+	font-size: 11px;
+	cursor: pointer;
+}
+#custom-dim-list .dim-delete-btn:hover {
+	background: #e53935;
+}
+#custom-dim-list .dim-pos {
+	color: #ffc247;
+	font-size: 11px;
+	margin-left: 4px;
+}
+.custom-dim-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	font-size: 11px;
+	margin: 0 2px;
+}
+.custom-dim-check input {
+	transform: scale(0.85);
+}
+.btn-dim, .menu .btn-dim {
+	font-size: 11px;
+	padding: 2px 5px;
+	border-radius: 3px;
+}
+.sc-item:hover { background: rgba(255,255,255,0.15) !important; }
+
+/* 快捷键捕获弹窗 */
+#sc-modal {
+	display: none;
+	position: fixed;
+	top: 0; left: 0; width: 100%; height: 100%;
+	background: rgba(0,0,0,0.6);
+	z-index: 1001;
+	justify-content: center;
+	align-items: center;
 }
