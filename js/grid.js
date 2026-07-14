@@ -1,7 +1,6 @@
 
 import { $, range, hz2y, x2t, t2x, f2d, qh, OFFSET } from './util.js'
 import { rootlayer } from './sequencer.js'
-
 export class Grid extends Konva.Layer {
 	constructor(stage, tonic, beat) {
 		super() // {listening: false})

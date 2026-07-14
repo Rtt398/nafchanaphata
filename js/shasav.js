@@ -215,6 +215,55 @@ for (const el of $$('.play-this-btn')) {
 	})
 }
 
+// 工程保存到文件
+// プロジェクトをファイルに保存 // Save project to file
+$('#save-project-btn').addEventListener('click', async e => {
+	const d = await Serializer.serialize(true)
+	if (window.showSaveFilePicker) {
+		try {
+			const handle = await window.showSaveFilePicker({
+				suggestedName: 'project.naf',
+				types: [{
+					description: 'Nafchan Project',
+					accept: { 'text/plain': ['.naf', '.txt'] }
+				}]
+			})
+			const writable = await handle.createWritable()
+			await writable.write(d)
+			await writable.close()
+			return
+		} catch (err) {
+			if (err.name === 'AbortError') return // 用户取消
+		}
+	}
+	// 回退：浏览器不支持 showSaveFilePicker
+	const blob = new Blob([d], { type: 'text/plain' })
+	const url = URL.createObjectURL(blob)
+	const a = document.createElement('a')
+	a.href = url; a.download = 'project.naf'
+	document.body.appendChild(a); a.click(); document.body.removeChild(a)
+	URL.revokeObjectURL(url)
+})
+
+// 从文件加载工程
+// ファイルからプロジェクトを読み込み // Load project from file
+$('#load-project-btn').addEventListener('click', e => {
+	const input = document.createElement('input')
+	input.type = 'file'; input.accept = '.naf,.txt'
+	input.onchange = async () => {
+		const file = input.files[0]
+		if (!file) return
+		const text = await file.text()
+		history.snapshot()
+		rootlayer.destroyChildren()
+		Tone.Transport.cancel()
+		await Serializer.deserialize(text.trim())
+		rootlayer.draw()
+		grid.autoLoop()
+	}
+	input.click()
+})
+
 if (location.search !== '') {
 	Serializer.deserialize(location.search.slice(1))
 }
