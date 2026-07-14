@@ -719,6 +719,201 @@ for (const el of $$('.mute-btn')) {
 	})
 }
 
+// ==================== 泛音拟合系统 ====================
+// ==================== 倍音フィッティング ====================
+// ==================== Harmonic Fitting ====================
+
+// 泛音映射：用户选择的谐波号 → {比例, 正向维度键, 反向维度键}
+// 倍音マッピング：ユーザー選択の倍音番号 → {比率, 正方向キー, 逆方向キー}
+// Harmonic mapping: selected harmonic number → {ratio, forward key, backward key}
+const HARMONIC_MAP = {
+	3:  { n: 3, d: 2, fw: '2d',  bw: '-2d' },
+	5:  { n: 5, d: 4, fw: '3d',  bw: '-3d' },
+	7:  { n: 7, d: 4, fw: '4d',  bw: '-4d' },
+	11: { n: 11, d: 4, fw: '5d', bw: '-5d' }  // 11/4，八度等价于 11/8
+}
+
+// 音分误差计算
+function centsOff(hz1, hz2) {
+	return 1200 * Math.abs(Math.log2(hz1 / hz2))
+}
+
+// BFS 搜索：从源频率出发，用选中的泛音步进，逼近目标频率
+function _harmonicSearch(srcHz, targetHz, allowedHarmonics, maxHarmTypes, maxSteps, errorCents, perHarmLimits) {
+	// 将目标归一化到源频率附近（八度范围内）
+	let tgt = targetHz
+	while (tgt > srcHz * 2) tgt /= 2
+	while (tgt < srcHz / 2) tgt *= 2
+
+	// 八度步：×2 或 ÷2
+	const octUp = { n: 2, d: 1, key: '1d',  harm: 0 }
+	const octDn = { n: 1, d: 2, key: '-1d', harm: 0 }
+
+	// 构建允许的移动列表（泛音 + 八度）
+	const moves = [octUp, octDn]
+	for (const h of allowedHarmonics) {
+		const hm = HARMONIC_MAP[h]
+		if (!hm) continue
+		moves.push({ n: hm.n, d: hm.d, key: hm.fw, harm: h })
+		moves.push({ n: hm.d, d: hm.n, key: hm.bw, harm: h })
+	}
+
+	// BFS: [当前频率, 当前比率分子, 当前比率分母, 步骤列表]
+	const queue = [[srcHz, 1, 1, []]]
+	const visited = new Set()
+	visited.add('1/1')
+
+	let bestPath = null
+	let bestError = Infinity
+
+	while (queue.length > 0) {
+		const [hz, rn, rd, path] = queue.shift()
+
+		// 检查是否到达目标（考虑八度等价）
+		const err = Math.min(centsOff(hz, tgt), centsOff(hz, tgt * 2), centsOff(hz, tgt / 2))
+		if (err < bestError) {
+			bestError = err
+			bestPath = path
+		}
+		if (err <= errorCents) break
+		if (path.length >= maxSteps) continue
+
+		for (const mv of moves) {
+			const nextRn = rn * mv.n
+			const nextRd = rd * mv.d
+			// 化简分数
+			const g = gcd(nextRn, nextRd)
+			const sr = `${nextRn / g}/${nextRd / g}`
+
+			if (visited.has(sr)) continue
+
+			// 检查泛音种类限制和每种泛音的次数限制
+			const harmCounts = {}
+			for (const s of path) {
+				if (s.harm > 0) harmCounts[s.harm] = (harmCounts[s.harm] || 0) + 1
+			}
+			const usedHarms = new Set(Object.keys(harmCounts).map(Number))
+
+			if (mv.harm > 0) {
+				// 检查该泛音是否超出次数限制
+				const limit = perHarmLimits?.[mv.harm]
+				if (limit != null && (harmCounts[mv.harm] || 0) >= limit) continue
+				// 检查是否超出泛音种类限制
+				if (!usedHarms.has(mv.harm)) {
+					if (usedHarms.size >= maxHarmTypes) continue
+				}
+			}
+
+			visited.add(sr)
+			queue.push([hz * mv.n / mv.d, nextRn, nextRd, [...path, { key: mv.key, harm: mv.harm }]])
+		}
+	}
+
+	// 如果找不到刚好误差内的路径，返回最佳路径
+	if (bestPath && bestPath.length > 0 && bestError <= errorCents * 3) {
+		return bestPath
+	}
+	// 即使超出误差也返回最佳路径（如果步数 > 0）
+	if (bestPath && bestPath.length > 0) return bestPath
+	return null
+}
+
+// 辅助函数：最大公约数
+function gcd(a, b) { return b ? gcd(b, a % b) : a }
+
+// 根据维度 key 获取 interval 对象
+function _intervalForKey(key) {
+	return pitchIntervals[key] || pitchIntervals['1d']
+}
+
+// 执行泛音拟合：对每个选中根音递归添加维度
+function _doHarmonicFit() {
+	const targetHz = parseFloat($('#hf-target-hz').value) || 440
+	const errorCents = parseFloat($('#hf-error').value) || 5
+	const maxSteps = parseInt($('#hf-max-steps').value) || 5
+	const maxHarmTypes = parseInt($('#hf-max-harm-count').value) || 2
+
+	const allowedHarmonics = []
+	if ($('#hf-harm-3').checked) allowedHarmonics.push(3)
+	if ($('#hf-harm-5').checked) allowedHarmonics.push(5)
+	if ($('#hf-harm-7').checked) allowedHarmonics.push(7)
+	if ($('#hf-harm-11').checked) allowedHarmonics.push(11)
+
+	if (allowedHarmonics.length === 0) return
+
+	// 读取每种泛音的限制次数
+	const perHarmLimits = {}
+	for (const h of allowedHarmonics) {
+		const lim = parseInt($(`#hf-limit-${h}`)?.value)
+		if (lim > 0) perHarmLimits[h] = lim
+	}
+
+	// 获取目标根音
+	const selected = window._sel?.selected?.size > 0 ? [...window._sel.selected] : []
+	const roots = selected.length > 0
+		? [...new Set(selected.map(n => n.root || n))]
+		: rootlayer.getChildren()
+
+	if (roots.length === 0) return
+
+	history.snapshot()
+
+	for (const root of roots) {
+		const srcHz = root.hz
+		const path = _harmonicSearch(srcHz, targetHz, allowedHarmonics, maxHarmTypes, maxSteps, errorCents, perHarmLimits)
+		if (!path || path.length === 0) continue
+
+		// 沿路径逐步添加子音符，每个新音符成为下一步的起点
+		let current = root
+		for (const step of path) {
+			const interval = _intervalForKey(step.key)
+			const child = current.addNote(current.len, interval, 0)
+			// 如果下一步也是针对同一个音，让子音成为新的 current
+			current = child
+		}
+	}
+
+	$('#harmonic-fit-modal').style.display = 'none'
+	$('#overlay').style.visibility = ''
+	rootlayer.draw()
+	grid.autoLoop()
+}
+
+// 打开泛音拟合弹窗
+function _openHarmonicFit() {
+	// 预填目标音高为当前 tonic
+	$('#hf-target-hz').value = grid.tonic || 440
+	$('#overlay').style.visibility = 'visible'
+	const modal = $('#harmonic-fit-modal')
+	modal.style.display = 'flex'
+	modal.style.justifyContent = 'center'
+	modal.style.alignItems = 'center'
+}
+
+// Config 按钮打开弹窗
+$('#harmonic-fit-btn').addEventListener('click', _openHarmonicFit)
+
+// 计算按钮
+$('#hf-calc-btn').addEventListener('click', _doHarmonicFit)
+
+// 取消按钮
+$('#hf-cancel-btn').addEventListener('click', () => {
+	$('#harmonic-fit-modal').style.display = 'none'
+	$('#overlay').style.visibility = ''
+})
+
+// 键盘 'c' 键打开（不拦截输入框）
+document.addEventListener('keydown', e => {
+	if (e.key === 'c' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+		const el = document.activeElement
+		const tag = el?.tagName
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || el?.isContentEditable) return
+		if ($('#overlay').style.visibility === 'visible') return  // 已有弹窗时不抢
+		e.preventDefault()
+		_openHarmonicFit()
+	}
+})
+
 // ==================== 自定义维度系统 ====================
 // ==================== カスタム次元システム ====================
 // ==================== Custom dimension system ====================
@@ -982,6 +1177,9 @@ $('#custom-dim-close-btn').addEventListener('click', () => {
 // 点击遮罩层关闭 // オーバーレイクリックで閉じる // Close on overlay click
 $('#custom-dim-modal').addEventListener('click', function(e) {
 	if (e.target === this) this.style.display = 'none'
+})
+$('#harmonic-fit-modal').addEventListener('click', function(e) {
+	if (e.target === this) { this.style.display = 'none'; $('#overlay').style.visibility = '' }
 })
 
 // 分子/分母输入时更新预览 // 分子/分母入力時にプレビューを更新 // Update preview on n/d input

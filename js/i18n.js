@@ -64,6 +64,7 @@ const tr = {
 		"mark-pos": "縦線位置",
 		"no-custom-dim": "カスタム次元はまだありません",
 		"close": "閉じる",
+		"cancel": "キャンセル",
 		"add": "追加",
 		"delete": "削除",
 		"clear": "全削除",
@@ -86,6 +87,16 @@ const tr = {
 		"bg-image": "背景画像",
 		"bg-image-choose": "ファイル選択",
 		"bg-image-clear": "画像クリア",
+		"harmonic-fit": "倍音フィット",
+		"harmonic-fit-open": "開く",
+		"harmonic-fit-title": "倍音フィッティング",
+		"harmonic-fit-use": "使用倍音：",
+		"harmonic-fit-per-limit": "各倍音の上限：",
+		"harmonic-fit-max-harm": "最大倍音種類",
+		"harmonic-fit-error": "誤差 (cents)",
+		"harmonic-fit-target": "目標 (Hz)",
+		"harmonic-fit-max-steps": "最大ステップ",
+		"harmonic-fit-calc": "計算開始",
 		"project": "プロジェクト",
 		"save": "保存",
 		"load": "読み込み",
@@ -167,7 +178,13 @@ const tr = {
 <h4>プロジェクト</h4>
 <p>.naf ファイル保存/読込</p>
 <p>URL 共有 — 全音符と設定をシリアライズ</p>
-<p>保存時にパスとファイル名を選択可能</p>`
+<p>保存時にパスとファイル名を選択可能</p>
+<h4>倍音フィッティング</h4>
+<p>Config → 倍音フィット → 開く — または <kbd>C</kbd> キー</p>
+<p>倍音（3/5/7/11）を選択し、各種の最大使用回数を設定</p>
+<p>目標音高、誤差（cents）、最大ステップ数を設定</p>
+<p>計算開始 — 選択したルート音に次元を再帰追加して目標音高に近似</p>
+<p>オクターブは常に使用可能（倍音選択に関わらず）</p>`
 	},
 	'en': {
 		"prog": "[Progress]",
@@ -203,6 +220,7 @@ const tr = {
 		"mark-pos": "Mark Position",
 		"no-custom-dim": "No custom dimensions",
 		"close": "Close",
+		"cancel": "Cancel",
 		"add": "Add",
 		"delete": "Delete",
 		"clear": "Clear",
@@ -225,6 +243,16 @@ const tr = {
 		"bg-image": "BG Image",
 		"bg-image-choose": "Choose File",
 		"bg-image-clear": "Clear Image",
+		"harmonic-fit": "Harmonic Fit",
+		"harmonic-fit-open": "Open",
+		"harmonic-fit-title": "Harmonic Tuning",
+		"harmonic-fit-use": "Use harmonics:",
+		"harmonic-fit-per-limit": "per-harmonic max:",
+		"harmonic-fit-max-harm": "Max harmonic types",
+		"harmonic-fit-error": "Error (cents)",
+		"harmonic-fit-target": "Target (Hz)",
+		"harmonic-fit-max-steps": "Max steps",
+		"harmonic-fit-calc": "Calculate",
 		"project": "Project",
 		"save": "Save",
 		"load": "Load",
@@ -306,7 +334,13 @@ const tr = {
 <h4>Project</h4>
 <p>Save / Load .naf files</p>
 <p>URL sharing — Serializes all notes and settings</p>
-<p>Choose save path and filename</p>`
+<p>Choose save path and filename</p>
+<h4>Harmonic Fitting</h4>
+<p>Config → Harmonic Fit → Open — or press <kbd>C</kbd></p>
+<p>Select harmonics (3/5/7/11) and set per-harmonic max usage</p>
+<p>Set target pitch, error tolerance (cents), and max steps</p>
+<p>Calculate — recursively extend selected roots towards target pitch</p>
+<p>Octave is always available regardless of harmonic selection</p>`
 	},
 	'zh': {
 		"prog": "［进行］",
@@ -342,6 +376,7 @@ const tr = {
 		"mark-pos": "竖线位置",
 		"no-custom-dim": "暂无自定义维度",
 		"close": "关闭",
+		"cancel": "取消",
 		"add": "添加",
 		"delete": "删除",
 		"clear": "清屏",
@@ -364,6 +399,16 @@ const tr = {
 		"bg-image": "背景图片",
 		"bg-image-choose": "选择文件",
 		"bg-image-clear": "清除图片",
+		"harmonic-fit": "泛音拟合",
+		"harmonic-fit-open": "打开",
+		"harmonic-fit-title": "泛音拟合",
+		"harmonic-fit-use": "使用泛音：",
+		"harmonic-fit-per-limit": "每泛音最多：",
+		"harmonic-fit-max-harm": "最多使用几种泛音",
+		"harmonic-fit-error": "误差 (音分)",
+		"harmonic-fit-target": "目标音高 (Hz)",
+		"harmonic-fit-max-steps": "最大步数",
+		"harmonic-fit-calc": "开始计算",
 		"project": "工程",
 		"save": "保存",
 		"load": "加载",
@@ -445,7 +490,13 @@ const tr = {
 <h4>工程管理</h4>
 <p>保存 / 加载 .naf 工程文件</p>
 <p>URL 分享 — 序列化所有音符和设置</p>
-<p>保存时可选路径和文件名</p>`
+<p>保存时可选路径和文件名</p>
+<h4>泛音拟合</h4>
+<p>Config → 泛音拟合 → 打开 — 或按 <kbd>C</kbd> 键</p>
+<p>勾选泛音（3/5/7/11）并设每种最多使用次数</p>
+<p>设置目标音高、误差（音分）、最大步数</p>
+<p>开始计算 — 对选中根音递归添加维度逼近目标音高</p>
+<p>八度始终可用，不受泛音选择限制</p>`
 	},
 	'sf': {
 		"prog": "[Clyftach]",
@@ -481,6 +532,7 @@ const tr = {
 		"mark-pos": "Marc Poxyx",
 		"no-custom-dim": "Nyca ra cux tym",
 		"close": "Zlyx",
+		"cancel": "Cancyl",
 		"add": "Addyna",
 		"delete": "Delete",
 		"clear": "Vanyc",
@@ -503,6 +555,16 @@ const tr = {
 		"bg-image": "Imagyn",
 		"bg-image-choose": "Chyca Fyla",
 		"bg-image-clear": "Vanyc Imagyn",
+		"harmonic-fit": "Hylmyn Fyt",
+		"harmonic-fit-open": "Xan",
+		"harmonic-fit-title": "Hylmyn Fyt",
+		"harmonic-fit-use": "Yca hylmync:",
+		"harmonic-fit-per-limit": "pal-hylmyn myx:",
+		"harmonic-fit-max-harm": "Myx hylmyn typac",
+		"harmonic-fit-error": "Elylyl (cyntc)",
+		"harmonic-fit-target": "Tylgat (Hz)",
+		"harmonic-fit-max-steps": "Myx cytpac",
+		"harmonic-fit-calc": "Calclyta",
 		"project": "Clypmelyt",
 		"save": "Plych",
 		"load": "Tatcha",
@@ -584,6 +646,12 @@ const tr = {
 <h4>Plyjact</h4>
 <p>Plych / Tatcha .naf fylyc</p>
 <p>URL chalyn — Calylyza yll nytyc ynd cyttyn</p>
-<p>Chyca plych pyth ynd fylynyma</p>`
+<p>Chyca plych pyth ynd fylynyma</p>
+<h4>Hylmyn Fyttyn</h4>
+<p>Ftytzc → Hylmyn Fyt → Xan — al plyc <kbd>C</kbd></p>
+<p>Sylct hylmync (3/5/7/11) ynd cyt pal-hylmyn myx ycaga</p>
+<p>Cyt tylgal pych, elylyl tylylync (cyntc), myx cytpac</p>
+<p>Calclyta — lyclycyva ext sylctad clyptyc talaldc tylgal pych</p>
+<p>Xctyva yc yllayc yvylybyl lagnylacx yf hylmyn sylctyna</p>`
 	},
 }
