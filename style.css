@@ -24,7 +24,6 @@
 }
 
 body {
-	position: fixed;
 	margin: 0;
 	padding: 0;
 	overflow: hidden;
@@ -55,17 +54,20 @@ i {
 }
 
 canvas {
-	image-rendering: pixelated;
+	image-rendering: auto;
+}
+#sequencer, #sequencer * {
+	max-width: none;
 }
 
 #sequencer {
 	width: 100vw;
-	height: 100lvh;
+	height: 100dvh;
 	background-color: #676681;
 }
 
 header {
-	padding-block-end: calc(100lvh - 100dvh);
+	padding-block-end: 0;
 }
 
 #config {
