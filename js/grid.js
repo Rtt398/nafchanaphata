@@ -1,5 +1,6 @@
 
 import { $, range, hz2y, x2t, t2x, f2d, qh, OFFSET } from './util.js'
+import { rootlayer } from './sequencer.js'
 
 export class Grid extends Konva.Layer {
 	constructor(stage, tonic, beat) {
@@ -185,5 +186,25 @@ export class Grid extends Konva.Layer {
 	setLoop() {
 		Tone.Transport.loopStart = x2t(this.loopStart.x()) + OFFSET + "i"
 		Tone.Transport.loopEnd = x2t(this.loopEnd.x()) + OFFSET + "i"
+	}
+
+	// 自动将循环箭头分配到最左/最右音符
+	autoLoop() {
+		const children = rootlayer.getChildren()
+		if (children.length === 0) return
+
+		let minX = Infinity, maxX = -Infinity
+		for (const note of children) {
+			const x = note.x()
+			const len = note.len || 48
+			if (x < minX) minX = x
+			if (x + len > maxX) maxX = x + len
+		}
+
+		const pad = 48  // 1拍间距
+		this.loopStart.x(minX - pad)
+		this.loopEnd.x(maxX + pad)
+		this.setLoop()
+		this.batchDraw()
 	}
 }
