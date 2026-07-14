@@ -5,8 +5,8 @@ export class Grid extends Konva.Layer {
 	constructor(stage, tonic, beat) {
 		super() // {listening: false})
 		this.stage = stage
-		this._tonic = tonic
-		this._beat = beat
+		this._tonic = tonic || 440
+		this._beat = beat || 500
 		this.octave = f2d(1, 2)
 		
 		this.scorelines = new Konva.Group()
