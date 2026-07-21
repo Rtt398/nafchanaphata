@@ -30,7 +30,10 @@ const tr = {
 		"base-note": "底音",
 		"other-note": "その他",
 		"tone": "音色",
-		"copy-finish": "コピー完了"
+		"copy-finish": "コピー完了",
+		"project": "プロジェクト",
+		"save": "保存",
+		"load": "読み込み"
 	},
 	'en': {
 		"prog": "[Progress]",
@@ -52,7 +55,10 @@ const tr = {
 		"base-note": "Base Notes",
 		"other-note": "Others",
 		"tone": "Instrument",
-		"copy-finish": "Copied"
+		"copy-finish": "Copied",
+		"project": "Project",
+		"save": "Save",
+		"load": "Load"
 	},
 	'sf': {
 		"prog": "[Clyftach]",
@@ -74,6 +80,9 @@ const tr = {
 		"base-note": "Lystalipam",
 		"other-note": "Fynächam",
 		"tone": "Vlesyvom",
-		"copy-finish": "Na chlacrapham"
+		"copy-finish": "Na chlacrapham",
+		"project": "Clypmelyt",
+		"save": "Plych",
+		"load": "Tatcha"
 	},
 }
